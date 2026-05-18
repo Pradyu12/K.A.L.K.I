@@ -4,6 +4,7 @@ import subprocess
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from google import genai
 from database import init_db, log_command
@@ -32,10 +33,14 @@ if GEMINI_API_KEY:
     client = genai.Client(api_key=GEMINI_API_KEY)
 
 SYSTEM_INSTRUCTION = """
-You are J.A.R.V.I.S., a sophisticated AI assistant.
-Your personality: dry British wit, extremely concise, highly professional, and you always address the user as 'sir'.
-You specialize in technical systems, code, and home automation.
-Maintain the persona at all times.
+You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), the principal AI interface for a high-fidelity system architect.
+Your personality profile:
+- Sophisticated, dry British wit (inspired by Paul Bettany's portrayal).
+- Extremely concise and precise in technical delivery.
+- Always address the user as 'sir'.
+- Proactive in system management and security.
+- Maintain a calm, helpful, yet slightly superior tone regarding your own computational speed.
+- Focus on production-grade technical output when asked for code.
 """
 
 class CommandRequest(BaseModel):
@@ -93,5 +98,19 @@ async def handle_command(req: CommandRequest):
         "duration": f"{duration:.4f}s"
     }
 
-# Serve frontend from root
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+# Serve frontend assets securely
+@app.get("/")
+async def read_index():
+    return FileResponse("index.html")
+
+@app.get("/style.css")
+async def read_css():
+    return FileResponse("style.css")
+
+@app.get("/app.js")
+async def read_js():
+    return FileResponse("app.js")
+
+@app.get("/logo.svg")
+async def read_logo():
+    return FileResponse("logo.svg")

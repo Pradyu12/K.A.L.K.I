@@ -122,10 +122,15 @@ function handleJarvisResponse(text) {
 }
 
 // --- Simulations for Testing ---
-document.getElementById('btnListen').addEventListener('click', () => {
+document.getElementById('btnListen').addEventListener('click', async () => {
+    await initAudio();
     if (recognition) {
-        recognition.start();
-        setState('listening');
+        try {
+            recognition.start();
+            setState('listening');
+        } catch(e) {
+            addLog('INFO: SPEECH_RESTART');
+        }
     } else {
         addLog('ERR: SPEECH_API_UNSUPPORTED');
         // Fallback mock
@@ -149,6 +154,29 @@ document.getElementById('btnSimulate').addEventListener('click', () => {
     processCommand(cmd);
 });
 
+// --- Audio Visualizer Logic ---
+let audioCtx;
+let analyzer;
+let dataArray;
+let source;
+
+async function initAudio() {
+    if (audioCtx) return;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyzer = audioCtx.createAnalyser();
+        source = audioCtx.createMediaStreamSource(stream);
+        source.connect(analyzer);
+        analyzer.fftSize = 64;
+        const bufferLength = analyzer.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+        addLog('AUDIO_SENSORS_ACTIVE');
+    } catch (err) {
+        addLog('ERR: MIC_ACCESS_DENIED');
+    }
+}
+
 // --- Arc Reactor Canvas Animation ---
 const canvas = document.getElementById('coreCanvas');
 const ctx = canvas.getContext('2d');
@@ -158,26 +186,40 @@ canvas.height = 120;
 function drawCore() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const time = Date.now() * 0.002;
-    const pulse = Math.sin(time) * 10 + 50;
+    let volume = 0;
 
-    // Dynamic Scaling based on "audio" (mocked)
-    if (document.body.classList.contains('state-listening') || document.body.classList.contains('state-speaking')) {
-        const scale = 1 + Math.sin(time * 2) * 0.05;
-        arcReactor.style.transform = `scale(${scale})`;
-    } else if (!document.body.classList.contains('state-processing')) {
-        arcReactor.style.transform = 'scale(1)';
+    if (analyzer) {
+        analyzer.getByteFrequencyData(dataArray);
+        volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
     }
 
+    const pulse = 40 + (volume / 255) * 40;
+    const opacity = 0.1 + (volume / 255) * 0.5;
+
+    // Dynamic Scaling based on audio
+    const scale = 1 + (volume / 255) * 0.3;
+    arcReactor.style.transform = `scale(${scale})`;
+
+    // Core Glow
     ctx.beginPath();
     ctx.arc(60, 60, pulse, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.1)';
+    ctx.fillStyle = `rgba(0, 240, 255, ${opacity})`;
     ctx.fill();
 
+    // Inner Circle
     ctx.beginPath();
     ctx.arc(60, 60, 30, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(0, 240, 255, 0.8)';
     ctx.lineWidth = 2;
     ctx.stroke();
+
+    // Pulse circles
+    for(let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(60, 60, 30 + i * (volume/10), 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(0, 240, 255, ${0.3 - i*0.1})`;
+        ctx.stroke();
+    }
 
     requestAnimationFrame(drawCore);
 }
