@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from google import genai
-from .database import init_db, log_command
+from database import init_db, log_command
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
@@ -93,5 +93,5 @@ async def handle_command(req: CommandRequest):
         "duration": f"{duration:.4f}s"
     }
 
-# Serve frontend
-app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+# Serve frontend from root
+app.mount("/", StaticFiles(directory=".", html=True), name="static")

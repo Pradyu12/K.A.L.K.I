@@ -2,7 +2,3 @@ __pycache__/
 *.db
 *.log
 *.png
-.DS_Store
-node_modules/
-venv/
-.env
