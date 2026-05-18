@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. HUD</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body class="state-idle">
+    <div class="background-overlay"></div>
+
+    <main class="hud-container">
+        <!-- Left Telemetry -->
+        <section class="panel side-panel left-panel">
+            <div class="panel-header">SYSTEM_METRICS</div>
+            <div class="metric-group">
+                <div class="metric-label">CPU_LOAD</div>
+                <div class="progress-bar"><div class="bar" style="width: 14%;"></div></div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">MEM_ALLOC</div>
+                <div class="progress-bar"><div class="bar" style="width: 32%;"></div></div>
+            </div>
+            <div class="metric-group">
+                <div class="metric-label">NET_TRAFFIC</div>
+                <div class="network-graph" id="networkGraph"></div>
+            </div>
+            <div class="log-container" id="terminalLogs">
+                <div class="log-entry">> INITIALIZING J.A.R.V.I.S. CORE...</div>
+                <div class="log-entry">> SECURE LINK ESTABLISHED</div>
+            </div>
+        </section>
+
+        <!-- Central Core -->
+        <section class="central-core">
+            <div class="arc-reactor" id="arcReactor">
+                <div class="ring ring-outer"></div>
+                <div class="ring ring-middle"></div>
+                <div class="ring ring-inner"></div>
+                <canvas id="coreCanvas"></canvas>
+            </div>
+            <div class="status-text" id="statusText">SYSTEM READY</div>
+            <div class="transcript" id="transcriptText"></div>
+        </section>
+
+        <!-- Right Telemetry -->
+        <section class="panel side-panel right-panel">
+            <div class="panel-header">SECURITY_PROTOCOL</div>
+            <div class="firewall-grid">
+                <div class="grid-line"></div>
+                <div class="grid-line"></div>
+                <div class="grid-line"></div>
+                <div class="grid-line"></div>
+                <div class="scan-line"></div>
+            </div>
+            <div class="security-status">
+                <span class="label">FIREWALL:</span> <span class="status-active">ACTIVE</span>
+            </div>
+            <div class="security-status">
+                <span class="label">ENCRYPTION:</span> <span class="status-active">AES-256</span>
+            </div>
+            <div class="panel-footer">
+                <button id="btnListen" class="fui-button">INITIATE VOICE</button>
+                <button id="btnSimulate" class="fui-button secondary">MOCK COMMAND</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="response-overlay" id="jarvisResponse"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
