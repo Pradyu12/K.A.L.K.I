@@ -42,8 +42,11 @@ let recognition;
 
 if (Recognition) {
     recognition = new Recognition();
+    // Provide clearer feedback and higher accuracy settings
     recognition.continuous = true;
-    recognition.interimResults = true;
+    recognition.interimResults = false; // only final results for clearer commands
+    recognition.lang = 'en-GB'; // British English for consistent pronunciation
+
 
     recognition.onstart = () => {
         addLog('VOICE_ENGINE_ONLINE');
@@ -96,16 +99,24 @@ async function processCommand(text) {
 }
 
 function handleJarvisResponse(text) {
+    // Ensure response addresses the user politely
+    const formattedText = text.startsWith('Sir') ? text : `Sir, ${text}`;
     setState('speaking');
-    responseOverlay.innerText = text;
+    responseOverlay.innerText = formattedText;
     responseOverlay.style.display = 'block';
     addLog('CMD_OUT: SUCCESS');
 
-    // Simulate speech synthesis if available
+    // Enhanced speech synthesis for clearer, British‑style voice
     if (window.speechSynthesis) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.1;
-        utterance.pitch = 0.9;
+        const utterance = new SpeechSynthesisUtterance(formattedText);
+        const voices = speechSynthesis.getVoices();
+        const britishVoice = voices.find(v => /en-GB/i.test(v.lang));
+        if (britishVoice) {
+            utterance.voice = britishVoice;
+        }
+        utterance.rate = 1.0; // natural speed
+        utterance.pitch = 1.0; // neutral pitch
+        utterance.volume = 1.0;
         utterance.onend = () => {
             setTimeout(() => {
                 setState('idle');
@@ -114,6 +125,7 @@ function handleJarvisResponse(text) {
         };
         window.speechSynthesis.speak(utterance);
     } else {
+        // fallback display
         setTimeout(() => {
             setState('idle');
             responseOverlay.style.display = 'none';
