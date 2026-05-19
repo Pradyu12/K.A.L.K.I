@@ -18,15 +18,20 @@ async def init_db():
         """)
         await db.commit()
 
-async def log_command(transcript, command, response, duration):
+async def log_command(transcript, intent, response, duration):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("""
             INSERT INTO command_logs (transcript, command, response, execution_duration)
             VALUES (?, ?, ?, ?)
-        """, (transcript, command, response, duration))
+        """, (transcript, intent, response, duration))
         await db.commit()
 
 async def get_recent_logs(limit=10):
     async with aiosqlite.connect(DB_PATH) as db:
         async with db.execute("SELECT transcript, response, timestamp FROM command_logs ORDER BY timestamp DESC LIMIT ?", (limit,)) as cursor:
             return await cursor.fetchall()
+
+async def clear_logs():
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("DELETE FROM command_logs")
+        await db.commit()

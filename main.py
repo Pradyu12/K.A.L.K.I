@@ -7,18 +7,16 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from google import genai
-from database import init_db, log_command
+from database import init_db, log_command, get_recent_logs, clear_logs
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize DB asynchronously on startup
     await init_db()
     yield
 
 app = FastAPI(lifespan=lifespan)
 
-# Enable CORS for local development
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,7 +24,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Gemini Client if API key is present
 GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY")
 client = None
 if GEMINI_API_KEY:
@@ -52,11 +49,9 @@ async def handle_command(req: CommandRequest):
     start_time = time.time()
     transcript = req.command
 
-    # Intention Engine
     response_text = ""
     intent = "chat"
 
-    # Local Structural Tasks
     if "system diagnostics" in transcript.lower():
         intent = "diagnostics"
         response_text = "Running system-wide diagnostics, sir. Core temperature is stable. Memory allocation at 14%. All sub-systems operational."
@@ -71,7 +66,6 @@ async def handle_command(req: CommandRequest):
         except:
             response_text = "I am unable to retrieve the system uptime at this moment, sir."
 
-    # AI Fallback
     if not response_text:
         if client:
             try:
@@ -87,8 +81,6 @@ async def handle_command(req: CommandRequest):
             response_text = "I am currently offline, sir. Please provide a valid API key to restore my advanced cognitive functions."
 
     duration = time.time() - start_time
-
-    # Log asynchronously (non-blocking)
     await log_command(transcript, intent, response_text, duration)
 
     return {
@@ -98,10 +90,13 @@ async def handle_command(req: CommandRequest):
         "duration": f"{duration:.4f}s"
     }
 
-# Serve frontend assets securely
 @app.get("/")
 async def read_index():
     return FileResponse("index.html")
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "jarvis"}
 
 @app.get("/style.css")
 async def read_css():
@@ -114,3 +109,29 @@ async def read_js():
 @app.get("/logo.svg")
 async def read_logo():
     return FileResponse("logo.svg")
+
+@app.get("/api/v1/logs")
+async def api_get_logs(limit: int = 50):
+    logs = await get_recent_logs(limit)
+    return {
+        "status": "success",
+        "count": len(logs),
+        "logs": [{"transcript": l[0], "response": l[1], "timestamp": l[2]} for l in logs]
+    }
+
+@app.delete("/api/v1/logs")
+async def api_clear_logs():
+    await clear_logs()
+    return {"status": "success", "message": "All logs cleared, sir."}
+
+@app.get("/api/v1/stats")
+async def api_stats():
+    logs = await get_recent_logs(1000)
+    intents = {}
+    for l in logs:
+        pass
+    return {
+        "status": "success",
+        "total_commands": len(logs),
+        "service": "jarvis"
+    }
