@@ -1,5 +1,5 @@
 /**
- * J.A.R.V.I.S. Interactive Logic
+ * J.A.R.V.I.S. Interactive Logic - Enhanced
  */
 
 const stateClasses = ['state-idle', 'state-listening', 'state-processing', 'state-speaking'];
@@ -9,22 +9,36 @@ const arcReactor = document.getElementById('arcReactor');
 const responseOverlay = document.getElementById('jarvisResponse');
 const terminalLogs = document.getElementById('terminalLogs');
 
+let targetState = 'idle';
+let stateTransitionTimeout = null;
+
 function setState(state) {
     document.body.classList.remove(...stateClasses);
     document.body.classList.add(`state-${state}`);
+    targetState = state;
 
+    clearTimeout(stateTransitionTimeout);
+    
     switch(state) {
         case 'listening':
-            statusText.innerText = 'LISTENING...';
+            statusText.innerText = 'KALKI LISTENING...';
+            statusText.style.color = 'var(--accent-alert)';
+            addLog('KALKI ACTIVATED');
             break;
         case 'processing':
             statusText.innerText = 'PROCESSING...';
+            statusText.style.color = 'var(--accent-alert)';
             break;
         case 'speaking':
-            statusText.innerText = 'J.A.R.V.I.S.';
+            statusText.innerText = 'KALKI';
+            statusText.style.color = '#fff';
             break;
         default:
             statusText.innerText = 'SYSTEM READY';
+            statusText.style.color = 'var(--accent-cyan)';
+            stateTransitionTimeout = setTimeout(() => {
+                statusText.innerText = 'AWAITING ACTIVATION...';
+            }, 5000);
     }
 }
 
@@ -33,99 +47,98 @@ function addLog(message) {
     entry.className = 'log-entry';
     entry.innerText = `> ${message}`;
     terminalLogs.prepend(entry);
-    if (terminalLogs.children.length > 15) terminalLogs.lastChild.remove();
+    if (terminalLogs.children.length > 20) terminalLogs.removeChild(terminalLogs.lastChild);
 }
 
-// --- Voice Recognition ---
+// Voice Recognition with Kalki Wake Word
 const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition;
+let isAwake = false;
 
 if (Recognition) {
     recognition = new Recognition();
-    // Provide clearer feedback and higher accuracy settings
     recognition.continuous = true;
-    recognition.interimResults = false; // only final results for clearer commands
-    recognition.lang = 'en-GB'; // British English for consistent pronunciation
-
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
 
     recognition.onstart = () => {
-        addLog('VOICE_ENGINE_ONLINE');
+        addLog('VOICE SENSORS ONLINE');
     };
 
     recognition.onresult = (event) => {
-        const transcript = Array.from(event.results)
-            .map(result => result[0])
-            .map(result => result.transcript)
-            .join('');
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        transcriptDisplay.innerText = transcript.trim();
 
-        transcriptDisplay.innerText = transcript;
-
-        if (transcript.toLowerCase().includes('jarvis') && document.body.classList.contains('state-idle')) {
-            addLog('WAKE_WORD_DETECTED');
+        const lowerTranscript = transcript.toLowerCase();
+        
+        // Detect KALKI or JARVIS wake word
+        if ((lowerTranscript.includes('kalki') || lowerTranscript.includes('jarvis')) && 
+            document.body.classList.contains('state-idle')) {
+            isAwake = true;
+            addLog('WAKE WORD DETECTED');
             setState('listening');
+        }
+        
+        // Process command when awake and in listening state
+        if (isAwake && lowerTranscript && document.body.classList.contains('state-listening')) {
+            const command = lowerTranscript.replace(/kalki|jarvis/gi, '').trim();
+            if (command) processCommand(command || transcript);
         }
     };
 
+    recognition.onerror = (event) => {
+        addLog(`VOICE ERROR: ${event.error}`);
+    };
+
     recognition.onend = () => {
-        const finalTranscript = transcriptDisplay.innerText;
-        if (finalTranscript && document.body.classList.contains('state-listening')) {
-            processCommand(finalTranscript);
-        } else if (document.body.classList.contains('state-listening')) {
+        if (document.body.classList.contains('state-listening') && !isAwake) {
             setState('idle');
         }
+        isAwake = false;
     };
 }
 
 async function processCommand(text) {
     setState('processing');
-    addLog(`CMD_IN: ${text.substring(0, 20)}...`);
+    addLog(`CMD: ${text.substring(0, 30)}...`);
 
     try {
         const response = await fetch('/api/v1/command', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                command: text,
-                timestamp: new Date().toISOString()
-            })
+            body: JSON.stringify({ command: text, timestamp: new Date().toISOString() })
         });
-
         const data = await response.json();
         handleJarvisResponse(data.response);
     } catch (err) {
-        addLog('ERR: API_DISCONNECT');
+        addLog('ERROR: CONNECTION FAILED');
         setState('idle');
     }
 }
 
 function handleJarvisResponse(text) {
-    // Ensure response addresses the user politely
-    const formattedText = text.startsWith('Sir') ? text : `Sir, ${text}`;
+    const formattedText = text.startsWith('Sir') || text.startsWith('sir') ? text : `Sir, ${text}`;
     setState('speaking');
     responseOverlay.innerText = formattedText;
     responseOverlay.style.display = 'block';
-    addLog('CMD_OUT: SUCCESS');
+    addLog('RESPONSE DELIVERED');
 
-    // Enhanced speech synthesis for clearer, British‑style voice
     if (window.speechSynthesis) {
         const utterance = new SpeechSynthesisUtterance(formattedText);
-        const voices = speechSynthesis.getVoices();
-        const britishVoice = voices.find(v => /en-GB/i.test(v.lang));
-        if (britishVoice) {
-            utterance.voice = britishVoice;
-        }
-        utterance.rate = 1.0; // natural speed
-        utterance.pitch = 1.0; // neutral pitch
+        utterance.rate = 1.0;
+        utterance.pitch = 1.1;
         utterance.volume = 1.0;
         utterance.onend = () => {
             setTimeout(() => {
                 setState('idle');
                 responseOverlay.style.display = 'none';
-            }, 2000);
+            }, 3000);
         };
         window.speechSynthesis.speak(utterance);
     } else {
-        // fallback display
         setTimeout(() => {
             setState('idle');
             responseOverlay.style.display = 'none';
@@ -133,44 +146,40 @@ function handleJarvisResponse(text) {
     }
 }
 
-// --- Simulations for Testing ---
 document.getElementById('btnListen').addEventListener('click', async () => {
-    await initAudio();
     if (recognition) {
         try {
+            await initAudio();
             recognition.start();
             setState('listening');
+            addLog('MANUAL ACTIVATION');
         } catch(e) {
-            addLog('INFO: SPEECH_RESTART');
+            addLog('VOICE ENGINE RESTART');
         }
     } else {
-        addLog('ERR: SPEECH_API_UNSUPPORTED');
-        // Fallback mock
+        addLog('VOICE API NOT SUPPORTED - SIMULATING');
         setState('listening');
         setTimeout(() => {
-            transcriptDisplay.innerText = "Jarvis, run system diagnostics.";
-            setTimeout(() => processCommand("Jarvis, run system diagnostics."), 1000);
-        }, 2000);
+            transcriptDisplay.innerText = "Kalki, show system status";
+            processCommand("show system status");
+        }, 1500);
     }
 });
 
 document.getElementById('btnSimulate').addEventListener('click', () => {
     const mockCommands = [
-        "What is the current system uptime?",
-        "Check database status, please.",
-        "Jarvis, who are you?",
-        "Run system diagnostics."
+        "Kalki, run system diagnostics",
+        "Kalki, check database status",
+        "Kalki, what is today's date?",
+        "Kalki, who are you?"
     ];
     const cmd = mockCommands[Math.floor(Math.random() * mockCommands.length)];
     transcriptDisplay.innerText = cmd;
     processCommand(cmd);
 });
 
-// --- Audio Visualizer Logic ---
-let audioCtx;
-let analyzer;
-let dataArray;
-let source;
+// Audio Visualizer
+let audioCtx, analyzer, dataArray, source;
 
 async function initAudio() {
     if (audioCtx) return;
@@ -180,59 +189,55 @@ async function initAudio() {
         analyzer = audioCtx.createAnalyser();
         source = audioCtx.createMediaStreamSource(stream);
         source.connect(analyzer);
-        analyzer.fftSize = 64;
-        const bufferLength = analyzer.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-        addLog('AUDIO_SENSORS_ACTIVE');
+        analyzer.fftSize = 128;
+        dataArray = new Uint8Array(analyzer.frequencyBinCount);
+        addLog('AUDIO SENSORS ACTIVE');
     } catch (err) {
-        addLog('ERR: MIC_ACCESS_DENIED');
+        addLog('AUDIO ACCESS DENIED');
     }
 }
 
-// --- Arc Reactor Canvas Animation ---
+// Arc Reactor Animation
 const canvas = document.getElementById('coreCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = 120;
-canvas.height = 120;
+const ctx = canvas?.getContext('2d');
+if (canvas && ctx) {
+    canvas.width = 160;
+    canvas.height = 160;
+    
+    function drawCore() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let volume = 0;
+        
+        if (analyzer) {
+            analyzer.getByteFrequencyData(dataArray);
+            volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+        }
 
-function drawCore() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const time = Date.now() * 0.002;
-    let volume = 0;
+        const pulse = 45 + (volume / 255) * 55;
+        const opacity = 0.15 + (volume / 255) * 0.6;
+        const scale = 1 + (volume / 255) * 0.4;
+        arcReactor.style.transform = `scale(${scale})`;
 
-    if (analyzer) {
-        analyzer.getByteFrequencyData(dataArray);
-        volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-    }
-
-    const pulse = 40 + (volume / 255) * 40;
-    const opacity = 0.1 + (volume / 255) * 0.5;
-
-    // Dynamic Scaling based on audio
-    const scale = 1 + (volume / 255) * 0.3;
-    arcReactor.style.transform = `scale(${scale})`;
-
-    // Core Glow
-    ctx.beginPath();
-    ctx.arc(60, 60, pulse, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(0, 240, 255, ${opacity})`;
-    ctx.fill();
-
-    // Inner Circle
-    ctx.beginPath();
-    ctx.arc(60, 60, 30, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.8)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Pulse circles
-    for(let i = 0; i < 3; i++) {
+        // Energy core
+        const gradient = ctx.createRadialGradient(80, 80, 0, 80, 80, pulse);
+        gradient.addColorStop(0, `rgba(0, 240, 255, ${opacity})`);
+        gradient.addColorStop(0.5, `rgba(0, 160, 255, ${opacity * 0.5})`);
+        gradient.addColorStop(1, 'transparent');
+        
         ctx.beginPath();
-        ctx.arc(60, 60, 30 + i * (volume/10), 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(0, 240, 255, ${0.3 - i*0.1})`;
-        ctx.stroke();
-    }
+        ctx.arc(80, 80, pulse, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
 
-    requestAnimationFrame(drawCore);
+        // Inner ring
+        ctx.beginPath();
+        ctx.arc(80, 80, 35, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(0, 240, 255, 0.9)`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        requestAnimationFrame(drawCore);
+    }
+    drawCore();
 }
-drawCore();

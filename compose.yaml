@@ -1,0 +1,10 @@
+services:
+  standardschemaspec:
+    image: standardschemaspec
+    build:
+      context: .kilo/node_modules/@standard-schema/spec
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
