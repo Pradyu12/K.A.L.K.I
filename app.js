@@ -1,5 +1,5 @@
 /**
- * KALKI Interactive HUD Logic
+ * KALKI Interactive HUD Logic - Tailwind Edition
  */
 
 const stateClasses = ['state-idle', 'state-listening', 'state-processing', 'state-speaking'];
@@ -14,41 +14,55 @@ function setState(state) {
     document.body.classList.remove(...stateClasses);
     document.body.classList.add(`state-${state}`);
 
-    switch(state) {
-        case 'listening':
-            statusText.innerText = 'LISTENING...';
-            break;
-        case 'processing':
-            statusText.innerText = 'PROCESSING...';
-            break;
-        case 'speaking':
-            statusText.innerText = 'KALKI';
-            break;
-        default:
-            statusText.innerText = 'SYSTEM READY';
+    if (statusText) {
+        switch(state) {
+            case 'listening':
+                statusText.innerText = 'LISTENING...';
+                statusText.classList.add('text-secondary');
+                break;
+            case 'processing':
+                statusText.innerText = 'PROCESSING...';
+                statusText.classList.add('animate-pulse');
+                break;
+            case 'speaking':
+                statusText.innerText = 'KALKI';
+                statusText.classList.remove('text-secondary', 'animate-pulse');
+                break;
+            default:
+                statusText.innerText = 'SYSTEM READY';
+                statusText.classList.remove('text-secondary', 'animate-pulse');
+        }
     }
 }
 
 function addLog(message) {
+    if (!terminalLogs) return;
     const entry = document.createElement('div');
-    entry.className = 'log-entry';
-    entry.innerText = `> ${message}`;
+    entry.className = 'opacity-80';
+    entry.innerText = `> ${new Date().toLocaleTimeString()} | ${message}`;
     terminalLogs.prepend(entry);
-    if (terminalLogs.children.length > 10) terminalLogs.lastChild.remove();
+    if (terminalLogs.children.length > 8) terminalLogs.lastChild.remove();
 }
 
 async function refreshMissions() {
+    if (!missionList) return;
     try {
         const res = await fetch('/api/v1/tasks');
         const data = await res.json();
         missionList.innerHTML = '';
         if (data.tasks.length === 0) {
-            missionList.innerHTML = '<div class="mission-item">NO ACTIVE MISSIONS</div>';
+            missionList.innerHTML = '<div class="text-on-surface-variant italic">NO ACTIVE MISSIONS</div>';
         } else {
             data.tasks.forEach(task => {
                 const item = document.createElement('div');
-                item.className = 'mission-item';
-                item.innerText = `[${task.priority.toUpperCase()}] ${task.title}`;
+                item.className = 'p-3 bg-surface-variant/40 border border-primary/5 rounded hover:bg-primary/5 transition-colors cursor-pointer group';
+                item.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-bold text-primary tracking-widest uppercase">${task.priority}</span>
+                        <span class="text-[8px] opacity-40">${new Date(task.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="text-xs group-hover:text-primary transition-colors">${task.title}</div>
+                `;
                 missionList.appendChild(item);
             });
         }
@@ -72,7 +86,7 @@ if (Recognition) {
             .map(result => result.transcript)
             .join('');
 
-        transcriptDisplay.innerText = transcript;
+        if (transcriptDisplay) transcriptDisplay.innerText = transcript;
 
         if (transcript.toLowerCase().includes('kalki') && document.body.classList.contains('state-idle')) {
             addLog('WAKE_WORD_DETECTED');
@@ -81,7 +95,7 @@ if (Recognition) {
     };
 
     recognition.onend = () => {
-        const finalTranscript = transcriptDisplay.innerText;
+        const finalTranscript = transcriptDisplay ? transcriptDisplay.innerText : '';
         if (finalTranscript && document.body.classList.contains('state-listening')) {
             processCommand(finalTranscript);
         } else if (document.body.classList.contains('state-listening')) {
@@ -114,8 +128,10 @@ async function processCommand(text) {
 
 function handleKalkiResponse(text, intent) {
     setState('speaking');
-    responseOverlay.innerText = text;
-    responseOverlay.style.display = 'block';
+    if (responseOverlay) {
+        responseOverlay.innerText = text;
+        responseOverlay.style.display = 'block';
+    }
     addLog(`INTENT: ${intent.toUpperCase()}`);
 
     if (intent.startsWith('task')) {
@@ -129,19 +145,19 @@ function handleKalkiResponse(text, intent) {
         utterance.onend = () => {
             setTimeout(() => {
                 setState('idle');
-                responseOverlay.style.display = 'none';
+                if (responseOverlay) responseOverlay.style.display = 'none';
             }, 1500);
         };
         window.speechSynthesis.speak(utterance);
     } else {
         setTimeout(() => {
             setState('idle');
-            responseOverlay.style.display = 'none';
+            if (responseOverlay) responseOverlay.style.display = 'none';
         }, 4000);
     }
 }
 
-document.getElementById('btnListen').addEventListener('click', async () => {
+const startListening = async () => {
     await initAudio();
     if (recognition) {
         try {
@@ -154,25 +170,30 @@ document.getElementById('btnListen').addEventListener('click', async () => {
         addLog('ERR: SPEECH_API_UNSUPPORTED');
         setState('listening');
         setTimeout(() => {
-            transcriptDisplay.innerText = "Kalki, list my tasks.";
+            if (transcriptDisplay) transcriptDisplay.innerText = "Kalki, list my tasks.";
             setTimeout(() => processCommand("Kalki, list my tasks."), 1000);
         }, 1500);
     }
-});
+};
 
-document.getElementById('btnSimulate').addEventListener('click', () => {
-    const mockCommands = [
-        "Add task manage project archives",
-        "List my missions",
-        "Scan the directory for files",
-        "Kalki, check my email",
-        "Run system diagnostics",
-        "Find main.py in the archives"
-    ];
-    const cmd = mockCommands[Math.floor(Math.random() * mockCommands.length)];
-    transcriptDisplay.innerText = cmd;
-    processCommand(cmd);
-});
+if (document.getElementById('btnListen')) document.getElementById('btnListen').addEventListener('click', startListening);
+if (document.getElementById('btnListenMobile')) document.getElementById('btnListenMobile').addEventListener('click', startListening);
+
+if (document.getElementById('btnSimulate')) {
+    document.getElementById('btnSimulate').addEventListener('click', () => {
+        const mockCommands = [
+            "Add task manage project archives",
+            "List my missions",
+            "Scan the directory for files",
+            "Kalki, check my email",
+            "Run system diagnostics",
+            "Find main.py in the archives"
+        ];
+        const cmd = mockCommands[Math.floor(Math.random() * mockCommands.length)];
+        if (transcriptDisplay) transcriptDisplay.innerText = cmd;
+        processCommand(cmd);
+    });
+}
 
 // --- Audio Visualizer ---
 let audioCtx, analyzer, dataArray, source;
@@ -194,35 +215,39 @@ async function initAudio() {
 
 // --- Canvas Animation ---
 const canvas = document.getElementById('coreCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = 120;
-canvas.height = 120;
+if (canvas) {
+    const ctx = canvas.getContext('2d');
+    canvas.width = 120;
+    canvas.height = 120;
 
-function drawCore() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let volume = 0;
-    if (analyzer) {
-        analyzer.getByteFrequencyData(dataArray);
-        volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+    function drawCore() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let volume = 0;
+        if (analyzer) {
+            analyzer.getByteFrequencyData(dataArray);
+            volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+        }
+
+        const pulse = 40 + (volume / 255) * 40;
+        const opacity = 0.15 + (volume / 255) * 0.5;
+        const scale = 1 + (volume / 255) * 0.2;
+        if (arcReactor) arcReactor.style.transform = `scale(${scale})`;
+
+        ctx.beginPath();
+        ctx.arc(60, 60, pulse, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 204, 0, ${opacity})`;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(60, 60, 30, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 204, 0, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        requestAnimationFrame(drawCore);
     }
-
-    const pulse = 40 + (volume / 255) * 40;
-    const opacity = 0.15 + (volume / 255) * 0.5;
-    const scale = 1 + (volume / 255) * 0.2;
-    arcReactor.style.transform = `scale(${scale})`;
-
-    ctx.beginPath();
-    ctx.arc(60, 60, pulse, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 204, 0, ${opacity})`;
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(60, 60, 30, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(255, 204, 0, 0.8)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    requestAnimationFrame(drawCore);
+    drawCore();
 }
-drawCore();
+
 refreshMissions();
+addLog('KALKI CORE ONLINE');

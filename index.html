@@ -1,87 +1,267 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KALKI HUD</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>KALKI_CORE - MISSION_CONTROL</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#110c08",
+                    "secondary-fixed": "#ffcc00",
+                    "tertiary-fixed": "#e8d0ff",
+                    "inverse-surface": "#f0e8e0",
+                    "surface-variant": "#1a120a",
+                    "on-tertiary": "#1a002e",
+                    "surface-tint": "#ffcc00",
+                    "surface-bright": "#241a0a",
+                    "secondary-container": "#4e3a1a",
+                    "on-tertiary-fixed": "#1a002e",
+                    "surface-container-highest": "#422c20",
+                    "on-primary-fixed": "#2e1f00",
+                    "tertiary-fixed-dim": "#c8a0f0",
+                    "inverse-primary": "#6e4c0a",
+                    "tertiary-container": "#3d2060",
+                    "surface-container-lowest": "#1a0e0a",
+                    "on-surface": "#f0e8e0",
+                    "surface-dim": "#24150f",
+                    "error": "#ff6b6b",
+                    "primary": "#ffcc00",
+                    "outline-variant": "#483a2a",
+                    "primary-fixed": "#ffeacc",
+                    "tertiary": "#9900ff",
+                    "primary-fixed-dim": "#ffcc00",
+                    "error-container": "#3d1414",
+                    "background": "#0a0502",
+                    "secondary": "#ff9933",
+                    "on-primary-fixed-variant": "#734d00",
+                    "on-error-container": "#ffb3b3",
+                    "on-surface-variant": "#c4b4a0",
+                    "on-secondary-fixed": "#2b1f0d",
+                    "surface": "#140f0a",
+                    "inverse-on-surface": "#1a0e0a",
+                    "on-secondary-container": "#ffcc00",
+                    "secondary-fixed-dim": "#ff9933",
+                    "surface-container-high": "#38241a",
+                    "surface-container": "#2e1c14",
+                    "on-primary": "#2e1f00",
+                    "on-background": "#f0e8e0",
+                    "outline": "#70604a",
+                    "primary-container": "#6e4d0e",
+                    "on-error": "#1a0000",
+                    "on-secondary-fixed-variant": "#5e4a2a",
+                    "on-secondary": "#2e1f00",
+                    "on-primary-container": "#ffeacc",
+                    "on-tertiary-fixed-variant": "#732a4d",
+                    "on-tertiary-container": "#e8d0ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "1rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                "margin-mobile": "20px",
+                "container-max": "1440px",
+                "margin-desktop": "64px",
+                "unit": "4px",
+                "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "display": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            },
+            "fontSize": {
+                "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "200"}],
+                "label-caps": ["10px", {"lineHeight": "16px", "letterSpacing": "0.2em", "fontWeight": "500"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.05em", "fontWeight": "200"}],
+                "data-numeral": ["18px", {"lineHeight": "24px", "letterSpacing": "0.1em", "fontWeight": "400"}],
+                "body-base": ["14px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "300"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "100"}],
+                "body-sm": ["12px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "300"}]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        .hud-glow { filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.6)); }
+        .hud-glow-secondary { filter: drop-shadow(0 0 8px rgba(255, 153, 51, 0.6)); }
+
+        .scanline {
+            background: linear-gradient(to bottom, transparent 50%, rgba(255, 204, 0, 0.03) 51%);
+            background-size: 100% 4px;
+        }
+
+        .widget-bracket {
+            position: relative;
+            background: rgba(26, 18, 10, 0.4);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 204, 0, 0.1);
+            border-radius: 0.5rem;
+        }
+
+        .arc-reactor-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes rotate-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotate-ccw { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+        .rotate-slow { animation: rotate-cw 20s linear infinite; }
+        .rotate-fast { animation: rotate-ccw 10s linear infinite; }
+
+        .response-overlay {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.9);
+            border-left: 4px solid #ffcc00;
+            padding: 20px;
+            z-index: 100;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+    </style>
 </head>
-<body class="state-idle">
-    <div class="background-overlay"></div>
+<body class="bg-background text-on-surface font-body overflow-x-hidden selection:bg-primary/20 selection:text-primary scanline min-h-screen flex flex-col md:flex-row relative">
 
-    <header class="hud-header">
-        <img src="logo.svg" alt="KALKI Logo" class="main-logo">
-        <div class="header-status">CORE_ACTIVE | PROTOCOL_V3.1</div>
-    </header>
+<div class="fixed inset-0 pointer-events-none z-0" style="background-image: linear-gradient(rgba(255, 204, 0, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 204, 0, 0.03) 1px, transparent 1px); background-size: 64px 64px;"></div>
 
-    <main class="hud-container">
-        <!-- Left Panel: Telemetry & Missions -->
-        <section class="panel side-panel left-panel">
-            <div class="panel-header">MISSION_LOG</div>
-            <div class="mission-list" id="missionList">
-                <!-- Tasks will be injected here -->
-                <div class="mission-item">INITIALIZING ARCHIVES...</div>
+<header class="bg-surface/40 backdrop-blur-3xl font-label text-label-caps fixed top-0 w-full border-b border-outline-variant flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 z-50">
+    <div class="flex items-center gap-4 hover:text-primary transition-colors duration-300">
+        <img src="logo.svg" alt="KALKI" class="h-8 w-8 hud-glow">
+        <span class="font-display text-display-lg-mobile tracking-tighter text-primary drop-shadow-[0_0_8px_rgba(255,204,0,0.6)]">KALKI_PROTOCOL</span>
+    </div>
+    <div class="flex items-center gap-6">
+        <div id="statusText" class="text-primary tracking-widest text-[10px]">SYSTEM READY</div>
+        <button id="btnListen" class="text-on-surface-variant hover:text-primary transition-colors duration-300"><span class="material-symbols-outlined">mic</span></button>
+        <button id="btnSimulate" class="text-on-surface-variant hover:text-primary transition-colors duration-300"><span class="material-symbols-outlined">terminal</span></button>
+    </div>
+</header>
+
+<nav class="hidden md:flex bg-surface/30 backdrop-blur-2xl font-label text-label-caps fixed left-0 top-0 h-full w-64 border-r border-outline-variant flex-col py-8 z-40 mt-16">
+    <div class="px-6 mb-12 flex flex-col gap-2">
+        <div class="text-on-surface-variant opacity-70 mb-1 tracking-widest">SYSTEM_AI_CORE</div>
+        <div class="font-headline text-headline-md text-secondary">KALKI_CORE</div>
+        <div class="text-on-surface-variant text-[10px] tracking-widest">V4.02_RIGHTEOUS</div>
+    </div>
+    <div class="flex flex-col gap-2 flex-grow">
+        <button class="flex items-center gap-4 px-6 py-3 bg-primary/10 text-primary border-l-2 border-primary transition-all duration-300 ease-in-out rounded-r-lg mr-4">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+            <span class="hud-glow tracking-widest">MISSION_CTRL</span>
+        </button>
+        <div class="px-6 py-4">
+            <div class="text-[10px] tracking-widest text-on-surface-variant mb-4">SYSTEM_LOGS</div>
+            <div id="terminalLogs" class="flex flex-col gap-2 text-[8px] font-mono opacity-60">
+                <!-- Logs injected here -->
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="flex-grow pt-24 pb-24 md:pl-[280px] md:pt-24 px-4 md:px-gutter w-full min-h-screen relative z-10 flex flex-col">
+    <div class="max-w-container-max mx-auto w-full h-full grid grid-cols-1 md:grid-cols-12 gap-gutter relative">
+
+        <!-- Left: Mission Log -->
+        <div class="widget-bracket col-span-1 md:col-span-4 p-6 flex flex-col h-[400px]">
+            <div class="flex justify-between items-center mb-4 border-b border-primary/10 pb-2">
+                <span class="font-label text-label-caps text-primary tracking-widest">MISSION_LOG</span>
+                <span class="material-symbols-outlined text-[16px] text-primary">assignment</span>
+            </div>
+            <div id="missionList" class="flex-grow overflow-y-auto pr-2 space-y-2 text-sm opacity-80">
+                <!-- Missions injected here -->
+            </div>
+        </div>
+
+        <!-- Center: Core Visualizer -->
+        <div class="col-span-1 md:col-span-4 flex flex-col items-center justify-center relative min-h-[300px]">
+            <div class="relative w-64 h-64 flex items-center justify-center">
+                <div class="absolute inset-0 border border-primary/20 rounded-full border-dashed rotate-slow"></div>
+                <div class="absolute inset-4 border-2 border-secondary/20 rounded-full border-dotted rotate-fast"></div>
+                <div id="arcReactor" class="relative z-10 w-32 h-32 flex items-center justify-center">
+                    <img src="logo.svg" class="w-20 h-20 hud-glow" alt="KALKI">
+                    <canvas id="coreCanvas" class="absolute inset-0"></canvas>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <h1 class="font-headline text-headline-md text-secondary tracking-[0.3em] uppercase hud-glow-secondary font-light">KALKI</h1>
+                <div id="transcriptText" class="text-[10px] text-primary tracking-[0.2em] block mt-4 opacity-50 h-4"></div>
+            </div>
+        </div>
+
+        <!-- Right: Archive Index & Telemetry -->
+        <div class="col-span-1 md:col-span-4 space-y-gutter">
+            <div class="widget-bracket p-6 flex flex-col h-48">
+                <div class="flex justify-between items-center mb-4 border-b border-primary/10 pb-2">
+                    <span class="font-label text-label-caps text-on-surface-variant tracking-widest">ARCHIVE_INDEX</span>
+                    <span class="material-symbols-outlined text-[16px] text-secondary">folder_open</span>
+                </div>
+                <div id="fileBrowser" class="flex-grow overflow-y-auto text-[10px] space-y-1 opacity-70">
+                    <div>> main.py</div>
+                    <div>> database.py</div>
+                    <div>> index.html</div>
+                    <div>> style.css</div>
+                    <div>> app.js</div>
+                </div>
             </div>
 
-            <div class="panel-header" style="margin-top: 20px;">SYSTEM_METRICS</div>
-            <div class="metric-group">
-                <div class="metric-label">CPU_LOAD</div>
-                <div class="progress-bar"><div class="bar" style="width: 14%;"></div></div>
+            <div class="widget-bracket p-6 flex flex-col h-48">
+                <div class="flex justify-between items-center mb-4 border-b border-primary/10 pb-2">
+                    <span class="font-label text-label-caps text-on-surface-variant tracking-widest">TELEMETRY</span>
+                    <span class="material-symbols-outlined text-[16px] text-primary">analytics</span>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between text-[10px] tracking-widest">
+                            <span>CPU_STABILITY</span>
+                            <span class="text-primary">98%</span>
+                        </div>
+                        <div class="h-1 bg-primary/10 rounded-full overflow-hidden">
+                            <div class="h-full bg-primary w-[98%]"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between text-[10px] tracking-widest">
+                            <span>MEM_ALLOC</span>
+                            <span class="text-secondary">42%</span>
+                        </div>
+                        <div class="h-1 bg-secondary/10 rounded-full overflow-hidden">
+                            <div class="h-full bg-secondary w-[42%]"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="metric-group">
-                <div class="metric-label">MEM_ALLOC</div>
-                <div class="progress-bar"><div class="bar" style="width: 32%;"></div></div>
-            </div>
-            <div class="log-container" id="terminalLogs">
-                <div class="log-entry">> INITIALIZING KALKI CORE...</div>
-            </div>
-        </section>
+        </div>
+    </div>
+</main>
 
-        <!-- Central Core -->
-        <section class="central-core">
-            <div class="arc-reactor" id="arcReactor">
-                <div class="ring ring-outer"></div>
-                <div class="ring ring-middle-outer"></div>
-                <div class="ring ring-middle"></div>
-                <div class="ring ring-inner"></div>
-                <div class="core-glow"></div>
-                <canvas id="coreCanvas"></canvas>
-            </div>
-            <div class="status-text" id="statusText">SYSTEM READY</div>
-            <div class="transcript" id="transcriptText"></div>
-        </section>
+<div id="kalkiResponse" class="response-overlay text-white font-light text-sm tracking-wide shadow-2xl"></div>
 
-        <!-- Right Panel: Topology & Archives -->
-        <section class="panel side-panel right-panel">
-            <div class="panel-header">ARCHIVE_INDEX</div>
-            <div class="file-browser" id="fileBrowser">
-                <div class="file-item">> main.py</div>
-                <div class="file-item">> database.py</div>
-                <div class="file-item">> index.html</div>
-                <div class="file-item">> style.css</div>
-                <div class="file-item">> app.js</div>
-            </div>
+<nav class="md:hidden bg-surface/60 backdrop-blur-3xl font-label text-label-caps text-secondary fixed bottom-0 left-0 w-full z-50 border-t border-outline-variant flex justify-around items-center h-20 px-6">
+    <button id="btnListenMobile" class="flex flex-col items-center justify-center text-primary active:scale-90 transition-transform">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mic</span>
+        <span class="mt-1 tracking-widest">LISTEN</span>
+    </button>
+    <button class="flex flex-col items-center justify-center text-on-surface-variant opacity-40 active:scale-90">
+        <span class="material-symbols-outlined">assignment</span>
+        <span class="mt-1 tracking-widest">LOGS</span>
+    </button>
+</nav>
 
-            <div class="panel-header" style="margin-top: 20px;">SECURITY_PROTOCOL</div>
-            <div class="firewall-grid">
-                <div class="scan-line"></div>
-            </div>
-            <div class="security-status">
-                <span class="label">FIREWALL:</span> <span class="status-active">ACTIVE</span>
-            </div>
-            <div class="security-status">
-                <span class="label">ENCRYPTION:</span> <span class="status-active">AES-256</span>
-            </div>
-            <div class="panel-footer">
-                <button id="btnListen" class="fui-button">INITIATE VOICE</button>
-                <button id="btnSimulate" class="fui-button secondary">MOCK COMMAND</button>
-            </div>
-        </section>
-    </main>
-
-    <div class="response-overlay" id="kalkiResponse"></div>
-
-    <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

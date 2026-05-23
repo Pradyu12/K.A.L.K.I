@@ -26,7 +26,6 @@ client = TestClient(app)
 def test_hud_access():
     response = client.get("/")
     assert response.status_code == 200
-    assert "KALKI HUD" in response.text
     assert "MISSION_LOG" in response.text
 
 def test_task_add_intent():
