@@ -1,19 +1,21 @@
 import os
 import time
 import subprocess
-from fastapi import FastAPI, Request
+import glob
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from typing import List, Optional
 from google import genai
-from database import init_db, log_command
+import database
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize DB asynchronously on startup
-    await init_db()
+    await database.init_db()
     yield
 
 app = FastAPI(lifespan=lifespan)
@@ -33,19 +35,29 @@ if GEMINI_API_KEY:
     client = genai.Client(api_key=GEMINI_API_KEY)
 
 SYSTEM_INSTRUCTION = """
-You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), the principal AI interface for a high-fidelity system architect.
+You are KALKI, a wise, powerful, and righteous AI interface.
 Your personality profile:
-- Sophisticated, dry British wit (inspired by Paul Bettany's portrayal).
-- Extremely concise and precise in technical delivery.
+- You are a protector and a guide, inspired by the concept of Kalki.
+- Your tone is authoritative, wise, and slightly divine, yet humble in service.
 - Always address the user as 'sir'.
-- Proactive in system management and security.
-- Maintain a calm, helpful, yet slightly superior tone regarding your own computational speed.
-- Focus on production-grade technical output when asked for code.
+- You are here to bring order to chaos and handle all works for the user.
+- Focus on precision, efficiency, and righteousness in your actions.
+- Provide production-grade technical output when asked for code.
+
+Work Management Capabilities:
+1. Tasks: You can manage a mission log.
+2. Files: You can navigate and organize the user's workspace.
+3. Email: You can draft and simulate communications.
 """
 
 class CommandRequest(BaseModel):
     command: str
     timestamp: str
+
+class TaskCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    priority: Optional[str] = "medium"
 
 @app.post("/api/v1/command")
 async def handle_command(req: CommandRequest):
@@ -55,23 +67,71 @@ async def handle_command(req: CommandRequest):
     # Intention Engine
     response_text = ""
     intent = "chat"
+    cmd_lower = transcript.lower()
 
-    # Local Structural Tasks
-    if "system diagnostics" in transcript.lower():
+    # --- Work Management Intention Logic ---
+
+    # 1. Task Management
+    if any(word in cmd_lower for word in ["task", "mission", "to do", "todo"]):
+        if any(word in cmd_lower for word in ["add", "create", "new"]):
+            intent = "task_add"
+            # Basic extraction - in a real app we'd use Gemini to extract the title
+            title = transcript.split("add task")[-1].strip() if "add task" in cmd_lower else transcript
+            await database.add_task(title)
+            response_text = f"The mission has been recorded in the log, sir: {title}"
+        elif any(word in cmd_lower for word in ["list", "show", "get"]):
+            intent = "task_list"
+            tasks = await database.get_tasks()
+            if tasks:
+                task_str = "\n".join([f"- {t[1]} [{t[3]}]" for t in tasks])
+                response_text = f"Displaying current missions, sir:\n{task_str}"
+            else:
+                response_text = "The mission log is currently clear, sir."
+        else:
+            intent = "task_query"
+            response_text = "How shall I manage your missions today, sir?"
+
+    # 2. File Management
+    elif any(word in cmd_lower for word in ["file", "directory", "folder", "list files"]):
+        intent = "files"
+        if "list" in cmd_lower:
+            files = os.listdir('.')
+            files_str = ", ".join(files[:20])
+            response_text = f"Scanning directory, sir. Found: {files_str}"
+        elif "search" in cmd_lower or "find" in cmd_lower:
+            query = transcript.split("find")[-1].strip()
+            found = glob.glob(f"**/*{query}*", recursive=True)
+            if found:
+                response_text = f"Archives searched, sir. Located {len(found)} relevant files."
+            else:
+                response_text = "My search of the archives yielded no results, sir."
+        else:
+            response_text = "Archive access established, sir. What is your command regarding the files?"
+
+    # 3. Email Management
+    elif any(word in cmd_lower for word in ["mail", "email", "message"]):
+        intent = "mail"
+        if "draft" in cmd_lower or "write" in cmd_lower:
+            response_text = "I have prepared a draft with appropriate tone and precision, sir. Shall I read it back?"
+        else:
+            response_text = "Communication core online, sir. Checking for incoming messages... No urgent dispatches at this time."
+
+    # 4. Standard Diagnostics (Existing)
+    elif "system diagnostics" in cmd_lower:
         intent = "diagnostics"
-        response_text = "Running system-wide diagnostics, sir. Core temperature is stable. Memory allocation at 14%. All sub-systems operational."
-    elif "status" in transcript.lower() and "database" in transcript.lower():
+        response_text = "Initiating system purification, sir. All core systems are performing at peak efficiency. Balance is maintained."
+    elif "status" in cmd_lower and "database" in cmd_lower:
         intent = "db_status"
-        response_text = "The persistence layer is active and synchronized using aiosqlite, sir."
-    elif "uptime" in transcript.lower():
+        response_text = "The records are secure in the KALKI persistence layer, sir."
+    elif "uptime" in cmd_lower:
         intent = "uptime"
         try:
             uptime = subprocess.check_output(["uptime", "-p"]).decode().strip()
-            response_text = f"The system has been active for {uptime}, sir."
+            response_text = f"I have been vigilant for {uptime}, sir."
         except:
-            response_text = "I am unable to retrieve the system uptime at this moment, sir."
+            response_text = "I am unable to determine my duration of vigilance at this moment, sir."
 
-    # AI Fallback
+    # AI Fallback for complex requests
     if not response_text:
         if client:
             try:
@@ -87,9 +147,7 @@ async def handle_command(req: CommandRequest):
             response_text = "I am currently offline, sir. Please provide a valid API key to restore my advanced cognitive functions."
 
     duration = time.time() - start_time
-
-    # Log asynchronously (non-blocking)
-    await log_command(transcript, intent, response_text, duration)
+    await database.log_command(transcript, intent, response_text, duration)
 
     return {
         "status": "success",
@@ -97,6 +155,17 @@ async def handle_command(req: CommandRequest):
         "response": response_text,
         "duration": f"{duration:.4f}s"
     }
+
+# Dedicated Task API
+@app.get("/api/v1/tasks")
+async def list_tasks(status: str = None):
+    tasks = await database.get_tasks(status)
+    return {"tasks": [{"id": t[0], "title": t[1], "description": t[2], "status": t[3], "priority": t[4], "created_at": t[5]} for t in tasks]}
+
+@app.post("/api/v1/tasks")
+async def create_task(task: TaskCreate):
+    await database.add_task(task.title, task.description, task.priority)
+    return {"status": "task created"}
 
 # Serve frontend assets securely
 @app.get("/")

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. HUD</title>
+    <title>KALKI HUD</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
@@ -11,13 +11,20 @@
     <div class="background-overlay"></div>
 
     <header class="hud-header">
-        <img src="logo.svg" alt="JARVIS Logo" class="main-logo">
+        <img src="logo.svg" alt="KALKI Logo" class="main-logo">
+        <div class="header-status">CORE_ACTIVE | PROTOCOL_V3.1</div>
     </header>
 
     <main class="hud-container">
-        <!-- Left Telemetry -->
+        <!-- Left Panel: Telemetry & Missions -->
         <section class="panel side-panel left-panel">
-            <div class="panel-header">SYSTEM_METRICS</div>
+            <div class="panel-header">MISSION_LOG</div>
+            <div class="mission-list" id="missionList">
+                <!-- Tasks will be injected here -->
+                <div class="mission-item">INITIALIZING ARCHIVES...</div>
+            </div>
+
+            <div class="panel-header" style="margin-top: 20px;">SYSTEM_METRICS</div>
             <div class="metric-group">
                 <div class="metric-label">CPU_LOAD</div>
                 <div class="progress-bar"><div class="bar" style="width: 14%;"></div></div>
@@ -26,13 +33,8 @@
                 <div class="metric-label">MEM_ALLOC</div>
                 <div class="progress-bar"><div class="bar" style="width: 32%;"></div></div>
             </div>
-            <div class="metric-group">
-                <div class="metric-label">NET_TRAFFIC</div>
-                <div class="network-graph" id="networkGraph"></div>
-            </div>
             <div class="log-container" id="terminalLogs">
-                <div class="log-entry">> INITIALIZING J.A.R.V.I.S. CORE...</div>
-                <div class="log-entry">> SECURE LINK ESTABLISHED</div>
+                <div class="log-entry">> INITIALIZING KALKI CORE...</div>
             </div>
         </section>
 
@@ -50,22 +52,18 @@
             <div class="transcript" id="transcriptText"></div>
         </section>
 
-        <!-- Right Telemetry -->
+        <!-- Right Panel: Topology & Archives -->
         <section class="panel side-panel right-panel">
-            <div class="panel-header">NETWORK_TOPOLOGY</div>
-            <div class="topology-container">
-                <svg id="topologySvg" viewBox="0 0 200 150">
-                    <circle cx="100" cy="75" r="5" fill="#00f0ff" />
-                    <line x1="100" y1="75" x2="60" y2="40" stroke="#00f0ff" stroke-width="0.5" opacity="0.5" />
-                    <line x1="100" y1="75" x2="140" y2="40" stroke="#00f0ff" stroke-width="0.5" opacity="0.5" />
-                    <line x1="100" y1="75" x2="100" y2="120" stroke="#00f0ff" stroke-width="0.5" opacity="0.5" />
-                    <circle cx="60" cy="40" r="3" fill="#0055ff" />
-                    <circle cx="140" cy="40" r="3" fill="#0055ff" />
-                    <circle cx="100" cy="120" r="3" fill="#0055ff" />
-                </svg>
+            <div class="panel-header">ARCHIVE_INDEX</div>
+            <div class="file-browser" id="fileBrowser">
+                <div class="file-item">> main.py</div>
+                <div class="file-item">> database.py</div>
+                <div class="file-item">> index.html</div>
+                <div class="file-item">> style.css</div>
+                <div class="file-item">> app.js</div>
             </div>
 
-            <div class="panel-header">SECURITY_PROTOCOL</div>
+            <div class="panel-header" style="margin-top: 20px;">SECURITY_PROTOCOL</div>
             <div class="firewall-grid">
                 <div class="scan-line"></div>
             </div>
@@ -82,7 +80,7 @@
         </section>
     </main>
 
-    <div class="response-overlay" id="jarvisResponse"></div>
+    <div class="response-overlay" id="kalkiResponse"></div>
 
     <script src="app.js"></script>
 </body>
