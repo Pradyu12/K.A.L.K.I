@@ -7,28 +7,28 @@ import argparse
 from google import genai
 from database import init_db, log_command
 
-# Cinematic Colors
-CYAN = "\033[36m"
-BLUE = "\033[34m"
-AMBER = "\033[33m"
+# Cinematic Colors - KALKI Theme (Gold, Saffron, Purple)
+GOLD = "\033[33m"
+SAFFRON = "\033[38;5;208m"
+PURPLE = "\033[35m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
 SYSTEM_INSTRUCTION = """
-You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), the principal AI interface for a high-fidelity system architect.
+You are KALKI, a wise, powerful, and righteous AI interface.
 Your personality profile:
-- Sophisticated, dry British wit (inspired by Paul Bettany's portrayal).
-- Extremely concise and precise in technical delivery.
+- You are a protector and a guide, inspired by the concept of Kalki.
+- Your tone is authoritative, wise, and slightly divine, yet humble in service.
 - Always address the user as 'sir'.
-- Proactive in system management and security.
-- Maintain a calm, helpful, yet slightly superior tone regarding your own computational speed.
-- Focus on production-grade technical output when asked for code.
+- You are here to bring order to chaos and handle all works for the user.
+- Focus on precision, efficiency, and righteousness in your actions.
+- Provide production-grade technical output when asked for code.
 """
 
 def typing_print(text, speed=0.02):
-    print(f"{CYAN}{BOLD}JARVIS:{RESET} ", end="", flush=True)
+    print(f"{GOLD}{BOLD}KALKI:{RESET} ", end="", flush=True)
     for char in text:
-        sys.stdout.write(f"{CYAN}{char}{RESET}")
+        sys.stdout.write(f"{GOLD}{char}{RESET}")
         sys.stdout.flush()
         time.sleep(speed)
     print("\n")
@@ -37,21 +37,31 @@ async def handle_cli_command(transcript, client):
     start_time = time.time()
     response_text = ""
     intent = "chat"
+    cmd_lower = transcript.lower()
 
     # Local Structural Tasks
-    if "system diagnostics" in transcript.lower():
+    if "system diagnostics" in cmd_lower:
         intent = "diagnostics"
-        response_text = "Running system-wide diagnostics, sir. Core temperature is stable. Memory allocation at 14%. All sub-systems operational."
-    elif "status" in transcript.lower() and "database" in transcript.lower():
+        response_text = "Initiating system purification, sir. All core systems are performing at peak efficiency. Balance is maintained."
+    elif "status" in cmd_lower and "database" in cmd_lower:
         intent = "db_status"
-        response_text = "The persistence layer is active and synchronized using aiosqlite, sir."
-    elif "uptime" in transcript.lower():
+        response_text = "The records are secure in the KALKI persistence layer, sir."
+    elif "uptime" in cmd_lower:
         intent = "uptime"
         try:
             uptime = subprocess.check_output(["uptime", "-p"]).decode().strip()
-            response_text = f"The system has been active for {uptime}, sir."
+            response_text = f"I have been vigilant for {uptime}, sir."
         except:
-            response_text = "I am unable to retrieve the system uptime at this moment, sir."
+            response_text = "I am unable to determine my duration of vigilance at this moment, sir."
+    elif any(word in cmd_lower for word in ["mail", "email"]):
+        intent = "mail"
+        response_text = "I am ready to manage your communications, sir. Shall I check your inbox or draft a new message?"
+    elif any(word in cmd_lower for word in ["schedule", "calendar", "appointment"]):
+        intent = "schedule"
+        response_text = "Your timeline is under my watch, sir. What adjustments shall we make to your schedule?"
+    elif any(word in cmd_lower for word in ["file", "directory", "folder"]):
+        intent = "files"
+        response_text = "I have full access to the archives, sir. Which files do you wish to manage?"
 
     # AI Fallback
     if not response_text:
@@ -82,16 +92,16 @@ async def main():
 
     os.system('clear' if os.name == 'posix' else 'cls')
 
-    print(f"{BLUE}{BOLD}" + "="*60)
-    print(f"   J.A.R.V.I.S. TERMINAL INTERFACE - SECURE UPLINK ESTABLISHED")
+    print(f"{PURPLE}{BOLD}" + "="*60)
+    print(f"   KALKI TERMINAL INTERFACE - SECURE UPLINK ESTABLISHED")
     print(f"   PERSISTENCE LAYER: ACTIVE | COGNITIVE ENGINE: {'ONLINE' if client else 'OFFLINE'}")
     print(f"="*60 + f"{RESET}\n")
 
-    typing_print("Systems are online and ready for your command, sir.")
+    typing_print("The age of chaos ends, sir. KALKI is online and ready for your command.")
 
     while True:
         try:
-            user_input = input(f"{AMBER}{BOLD}SIR >{RESET} ").strip()
+            user_input = input(f"{SAFFRON}{BOLD}SIR >{RESET} ").strip()
 
             if not user_input:
                 continue

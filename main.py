@@ -33,14 +33,14 @@ if GEMINI_API_KEY:
     client = genai.Client(api_key=GEMINI_API_KEY)
 
 SYSTEM_INSTRUCTION = """
-You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), the principal AI interface for a high-fidelity system architect.
+You are KALKI, a wise, powerful, and righteous AI interface.
 Your personality profile:
-- Sophisticated, dry British wit (inspired by Paul Bettany's portrayal).
-- Extremely concise and precise in technical delivery.
+- You are a protector and a guide, inspired by the concept of Kalki.
+- Your tone is authoritative, wise, and slightly divine, yet humble in service.
 - Always address the user as 'sir'.
-- Proactive in system management and security.
-- Maintain a calm, helpful, yet slightly superior tone regarding your own computational speed.
-- Focus on production-grade technical output when asked for code.
+- You are here to bring order to chaos and handle all works for the user.
+- Focus on precision, efficiency, and righteousness in your actions.
+- Provide production-grade technical output when asked for code.
 """
 
 class CommandRequest(BaseModel):
@@ -55,21 +55,31 @@ async def handle_command(req: CommandRequest):
     # Intention Engine
     response_text = ""
     intent = "chat"
+    cmd_lower = transcript.lower()
 
     # Local Structural Tasks
-    if "system diagnostics" in transcript.lower():
+    if "system diagnostics" in cmd_lower:
         intent = "diagnostics"
-        response_text = "Running system-wide diagnostics, sir. Core temperature is stable. Memory allocation at 14%. All sub-systems operational."
-    elif "status" in transcript.lower() and "database" in transcript.lower():
+        response_text = "Initiating system purification, sir. All core systems are performing at peak efficiency. Balance is maintained."
+    elif "status" in cmd_lower and "database" in cmd_lower:
         intent = "db_status"
-        response_text = "The persistence layer is active and synchronized using aiosqlite, sir."
-    elif "uptime" in transcript.lower():
+        response_text = "The records are secure in the KALKI persistence layer, sir."
+    elif "uptime" in cmd_lower:
         intent = "uptime"
         try:
             uptime = subprocess.check_output(["uptime", "-p"]).decode().strip()
-            response_text = f"The system has been active for {uptime}, sir."
+            response_text = f"I have been vigilant for {uptime}, sir."
         except:
-            response_text = "I am unable to retrieve the system uptime at this moment, sir."
+            response_text = "I am unable to determine my duration of vigilance at this moment, sir."
+    elif any(word in cmd_lower for word in ["mail", "email"]):
+        intent = "mail"
+        response_text = "I am ready to manage your communications, sir. Shall I check your inbox or draft a new message?"
+    elif any(word in cmd_lower for word in ["schedule", "calendar", "appointment"]):
+        intent = "schedule"
+        response_text = "Your timeline is under my watch, sir. What adjustments shall we make to your schedule?"
+    elif any(word in cmd_lower for word in ["file", "directory", "folder"]):
+        intent = "files"
+        response_text = "I have full access to the archives, sir. Which files do you wish to manage?"
 
     # AI Fallback
     if not response_text:

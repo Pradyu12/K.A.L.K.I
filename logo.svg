@@ -8,9 +8,10 @@
       </feMerge>
     </filter>
   </defs>
-  <path d="M30 20 H70 L60 30 H40 V70 L30 80 V20 Z" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)" />
-  <path d="M50 40 L60 50 L50 60 L40 50 Z" fill="#00f0ff" filter="url(#glow)">
+  <!-- Sword/Vajra inspired shape for KALKI -->
+  <path d="M50 10 L60 30 L55 30 L55 70 L65 80 L50 90 L35 80 L45 70 L45 30 L40 30 Z" fill="none" stroke="#ffcc00" stroke-width="2" filter="url(#glow)" />
+  <path d="M50 40 L55 50 L50 60 L45 50 Z" fill="#ffcc00" filter="url(#glow)">
     <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />
   </path>
-  <text x="50" y="95" text-anchor="middle" fill="#00f0ff" font-family="Share Tech Mono" font-size="12" filter="url(#glow)">J.A.R.V.I.S.</text>
+  <text x="50" y="98" text-anchor="middle" fill="#ffcc00" font-family="Share Tech Mono" font-size="12" filter="url(#glow)">KALKI</text>
 </svg>

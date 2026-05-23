@@ -19,7 +19,7 @@ def test_health_check():
     # health check is not in main.py anymore, but let's check index
     response = client.get("/")
     assert response.status_code == 200
-    assert "J.A.R.V.I.S. HUD" in response.text
+    assert "KALKI HUD" in response.text
 
 def test_diagnostics_intent():
     response = client.post(

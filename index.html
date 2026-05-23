@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. HUD</title>
+    <title>KALKI HUD</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
@@ -11,7 +11,7 @@
     <div class="background-overlay"></div>
 
     <header class="hud-header">
-        <img src="logo.svg" alt="JARVIS Logo" class="main-logo">
+        <img src="logo.svg" alt="KALKI Logo" class="main-logo">
     </header>
 
     <main class="hud-container">
@@ -31,7 +31,7 @@
                 <div class="network-graph" id="networkGraph"></div>
             </div>
             <div class="log-container" id="terminalLogs">
-                <div class="log-entry">> INITIALIZING J.A.R.V.I.S. CORE...</div>
+                <div class="log-entry">> INITIALIZING KALKI CORE...</div>
                 <div class="log-entry">> SECURE LINK ESTABLISHED</div>
             </div>
         </section>
@@ -55,13 +55,13 @@
             <div class="panel-header">NETWORK_TOPOLOGY</div>
             <div class="topology-container">
                 <svg id="topologySvg" viewBox="0 0 200 150">
-                    <circle cx="100" cy="75" r="5" fill="#00f0ff" />
-                    <line x1="100" y1="75" x2="60" y2="40" stroke="#00f0ff" stroke-width="0.5" opacity="0.5" />
-                    <line x1="100" y1="75" x2="140" y2="40" stroke="#00f0ff" stroke-width="0.5" opacity="0.5" />
-                    <line x1="100" y1="75" x2="100" y2="120" stroke="#00f0ff" stroke-width="0.5" opacity="0.5" />
-                    <circle cx="60" cy="40" r="3" fill="#0055ff" />
-                    <circle cx="140" cy="40" r="3" fill="#0055ff" />
-                    <circle cx="100" cy="120" r="3" fill="#0055ff" />
+                    <circle cx="100" cy="75" r="5" fill="#ffcc00" />
+                    <line x1="100" y1="75" x2="60" y2="40" stroke="#ffcc00" stroke-width="0.5" opacity="0.5" />
+                    <line x1="100" y1="75" x2="140" y2="40" stroke="#ffcc00" stroke-width="0.5" opacity="0.5" />
+                    <line x1="100" y1="75" x2="100" y2="120" stroke="#ffcc00" stroke-width="0.5" opacity="0.5" />
+                    <circle cx="60" cy="40" r="3" fill="#ff9933" />
+                    <circle cx="140" cy="40" r="3" fill="#ff9933" />
+                    <circle cx="100" cy="120" r="3" fill="#ff9933" />
                 </svg>
             </div>
 
@@ -82,7 +82,7 @@
         </section>
     </main>
 
-    <div class="response-overlay" id="jarvisResponse"></div>
+    <div class="response-overlay" id="kalkiResponse"></div>
 
     <script src="app.js"></script>
 </body>

@@ -1,12 +1,12 @@
 /**
- * J.A.R.V.I.S. Interactive Logic
+ * KALKI Interactive Logic
  */
 
 const stateClasses = ['state-idle', 'state-listening', 'state-processing', 'state-speaking'];
 const statusText = document.getElementById('statusText');
 const transcriptDisplay = document.getElementById('transcriptText');
 const arcReactor = document.getElementById('arcReactor');
-const responseOverlay = document.getElementById('jarvisResponse');
+const responseOverlay = document.getElementById('kalkiResponse');
 const terminalLogs = document.getElementById('terminalLogs');
 
 function setState(state) {
@@ -21,7 +21,7 @@ function setState(state) {
             statusText.innerText = 'PROCESSING...';
             break;
         case 'speaking':
-            statusText.innerText = 'J.A.R.V.I.S.';
+            statusText.innerText = 'KALKI';
             break;
         default:
             statusText.innerText = 'SYSTEM READY';
@@ -57,7 +57,7 @@ if (Recognition) {
 
         transcriptDisplay.innerText = transcript;
 
-        if (transcript.toLowerCase().includes('jarvis') && document.body.classList.contains('state-idle')) {
+        if (transcript.toLowerCase().includes('kalki') && document.body.classList.contains('state-idle')) {
             addLog('WAKE_WORD_DETECTED');
             setState('listening');
         }
@@ -136,8 +136,8 @@ document.getElementById('btnListen').addEventListener('click', async () => {
         // Fallback mock
         setState('listening');
         setTimeout(() => {
-            transcriptDisplay.innerText = "Jarvis, run system diagnostics.";
-            setTimeout(() => processCommand("Jarvis, run system diagnostics."), 1000);
+            transcriptDisplay.innerText = "Kalki, run system diagnostics.";
+            setTimeout(() => processCommand("Kalki, run system diagnostics."), 1000);
         }, 2000);
     }
 });
@@ -146,8 +146,10 @@ document.getElementById('btnSimulate').addEventListener('click', () => {
     const mockCommands = [
         "What is the current system uptime?",
         "Check database status, please.",
-        "Jarvis, who are you?",
-        "Run system diagnostics."
+        "Kalki, who are you?",
+        "Run system diagnostics.",
+        "Check my mail.",
+        "What is my schedule today?"
     ];
     const cmd = mockCommands[Math.floor(Math.random() * mockCommands.length)];
     transcriptDisplay.innerText = cmd;
@@ -203,13 +205,13 @@ function drawCore() {
     // Core Glow
     ctx.beginPath();
     ctx.arc(60, 60, pulse, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(0, 240, 255, ${opacity})`;
+    ctx.fillStyle = `rgba(255, 204, 0, ${opacity})`;
     ctx.fill();
 
     // Inner Circle
     ctx.beginPath();
     ctx.arc(60, 60, 30, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.8)';
+    ctx.strokeStyle = 'rgba(255, 204, 0, 0.8)';
     ctx.lineWidth = 2;
     ctx.stroke();
 
@@ -217,7 +219,7 @@ function drawCore() {
     for(let i = 0; i < 3; i++) {
         ctx.beginPath();
         ctx.arc(60, 60, 30 + i * (volume/10), 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(0, 240, 255, ${0.3 - i*0.1})`;
+        ctx.strokeStyle = `rgba(255, 204, 0, ${0.3 - i*0.1})`;
         ctx.stroke();
     }
 

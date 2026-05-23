@@ -2,7 +2,7 @@ import aiosqlite
 import asyncio
 from pathlib import Path
 
-DB_PATH = Path("jarvis_core.db")
+DB_PATH = Path("kalki_core.db")
 
 async def init_db():
     async with aiosqlite.connect(DB_PATH) as db:
