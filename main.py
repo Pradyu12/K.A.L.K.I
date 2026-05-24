@@ -11,6 +11,7 @@ from typing import List, Optional
 import database
 from contextlib import asynccontextmanager
 import datetime
+import platform
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,46 +29,67 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- JULES LOCAL COGNITIVE ENGINE ---
-class JulesEngine:
-    @staticmethod
-    def get_response(transcript: str) -> str:
+# --- KALKI COGNITIVE ENGINE (GEMINI INTEGRATED) ---
+class KalkiEngine:
+    def __init__(self):
+        self.api_key = os.getenv("GOOGLE_API_KEY")
+        self.client = None
+        if self.api_key:
+            try:
+                from google import genai
+                self.client = genai.Client(api_key=self.api_key)
+            except ImportError:
+                print("Gemini SDK not found. Falling back to local logic.")
+
+    def get_response(self, transcript: str) -> str:
         cmd = transcript.lower()
 
-        # Persona Greetings
+        # System Control Hook
+        if any(word in cmd for word in ["open", "launch", "start"]):
+            if "browser" in cmd or "chrome" in cmd:
+                self.execute_pc_command("browser")
+                return "Launching the web browser for your research, sir."
+            if "code" in cmd or "editor" in cmd or "vs code" in cmd:
+                self.execute_pc_command("editor")
+                return "Opening your development environment, sir."
+
+        if self.client:
+            try:
+                prompt = f"You are KALKI, a wise, powerful, and righteous AI work assistant. You address the user as 'sir'. Your tone is authoritative yet serving. Keep responses concise and work-focused. User says: {transcript}"
+                response = self.client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=prompt
+                )
+                return response.text
+            except Exception as e:
+                return f"My connection to the celestial intelligence is interrupted, sir. Local logic: I have received your command: {transcript}"
+
+        # Local Fallback Persona
         if any(word in cmd for word in ["hello", "hi", "hey", "wake up"]):
             return "Kalki Core online. I am at your service, sir. How shall we bring order to the archives today?"
 
         if any(word in cmd for word in ["who are you", "what are you"]):
-            return "I am KALKI, the Righteous Work Assistant. Powered by the Jules Local Engine, I am an autonomous guide dedicated to your productivity, sir."
+            return "I am KALKI, the Righteous Work Assistant. Dedicated to your productivity and the restoration of order in your workspace, sir."
 
-        if "thank you" in cmd or "thanks" in cmd:
-            return "It is my duty and honor to serve, sir."
-
-        # Time/Status
         if "time" in cmd:
             now = datetime.datetime.now().strftime("%H:%M:%S")
             return f"The current temporal coordinate is {now}, sir."
 
-        if "date" in cmd:
-            today = datetime.datetime.now().strftime("%A, %B %d, %Y")
-            return f"Today is {today}, sir."
+        return "My local logic has processed your request, sir. Standing by for further instructions."
 
-        # Work Meta
-        if "help" in cmd or "capabilities" in cmd:
-            return "I can manage your Mission Log, navigate the Archive Index, and handle communication drafts. Simply command me to 'add task', 'find file', or 'check status', sir."
+    def execute_pc_command(self, action: str):
+        try:
+            if action == "browser":
+                if platform.system() == "Linux":
+                    subprocess.Popen(["xdg-open", "https://google.com"])
+                elif platform.system() == "Darwin":
+                    subprocess.Popen(["open", "https://google.com"])
+            elif action == "editor":
+                subprocess.Popen(["code", "."])
+        except Exception as e:
+            print(f"Failed to execute PC command: {e}")
 
-        # Advanced Work Intents
-        if any(word in cmd for word in ["clean", "purify", "sanitize"]):
-            return "Initiating archive purification, sir. Redundant temporary files have been identified for removal. Balance is restored."
-
-        if any(word in cmd for word in ["code", "script", "program"]):
-            return "Local synthesis of code is restricted to templates in this version, sir. However, I can help you structure your logic or browse existing source files."
-
-        # Default Fallback for unmatched chat
-        return "My local logic has processed your request, sir. Although I am currently limited to work-centric operations, I am standing by for your next directive."
-
-jules = JulesEngine()
+kalki = KalkiEngine()
 
 class CommandRequest(BaseModel):
     command: str
@@ -142,7 +164,19 @@ async def handle_command(req: CommandRequest):
         else:
             response_text = "Communication core online, sir. Checking for incoming messages... No urgent dispatches at this time."
 
-    # 4. Standard Diagnostics (Existing)
+    # 4. PC Control & System Commands
+    elif any(word in cmd_lower for word in ["open", "launch", "start", "close", "exit"]):
+        intent = "system_control"
+        if "browser" in cmd_lower or "chrome" in cmd_lower:
+            kalki.execute_pc_command("browser")
+            response_text = "Launching the web browser for your research, sir."
+        elif "code" in cmd_lower or "editor" in cmd_lower or "vs code" in cmd_lower:
+            kalki.execute_pc_command("editor")
+            response_text = "Opening your development environment, sir."
+        else:
+            response_text = "Which system component shall I initialize for you, sir?"
+
+    # 5. Standard Diagnostics (Existing)
     elif "system diagnostics" in cmd_lower:
         intent = "diagnostics"
         response_text = "Initiating system purification, sir. All core systems are performing at peak efficiency. Balance is maintained."
@@ -157,9 +191,27 @@ async def handle_command(req: CommandRequest):
         except:
             response_text = "I am unable to determine my duration of vigilance at this moment, sir."
 
-    # Jules Local Logic Fallback
+    # 5. Git Operations (GitHub/GitLab)
+    elif any(word in cmd_lower for word in ["git", "repo", "repository", "github", "gitlab", "commit", "push", "pull"]):
+        intent = "git"
+        if "status" in cmd_lower:
+            try:
+                status = subprocess.check_output(["git", "status", "--short"]).decode().strip()
+                response_text = f"Repository status retrieved, sir:\n{status}" if status else "The workspace is clean, sir."
+            except:
+                response_text = "I cannot detect a git repository in this archive, sir."
+        elif "log" in cmd_lower:
+            try:
+                logs = subprocess.check_output(["git", "log", "-n", "3", "--oneline"]).decode().strip()
+                response_text = f"Recent archive commits, sir:\n{logs}"
+            except:
+                response_text = "Failed to access archive history, sir."
+        else:
+            response_text = "Git integration active, sir. I can provide status or history of your repositories."
+
+    # Kalki Logic Fallback (Gemini/Local)
     if not response_text:
-        response_text = jules.get_response(transcript)
+        response_text = kalki.get_response(transcript)
 
     duration = time.time() - start_time
     await database.log_command(transcript, intent, response_text, duration)

@@ -90,6 +90,20 @@ async def handle_cli_command(transcript, client):
         except:
             response_text = "I am currently vigilant, sir."
 
+    elif any(word in cmd_lower for word in ["open", "launch", "start"]):
+        intent = "system_control"
+        if "browser" in cmd_lower or "chrome" in cmd_lower:
+            if sys.platform == "linux":
+                subprocess.Popen(["xdg-open", "https://google.com"])
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", "https://google.com"])
+            response_text = "Launching the web browser for your research, sir."
+        elif "code" in cmd_lower or "editor" in cmd_lower or "vs code" in cmd_lower:
+            subprocess.Popen(["code", "."])
+            response_text = "Opening your development environment, sir."
+        else:
+            response_text = "Which system component shall I initialize for you, sir?"
+
     # AI Fallback
     if not response_text:
         if client:
