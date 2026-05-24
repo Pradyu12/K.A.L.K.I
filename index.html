@@ -197,9 +197,12 @@
                     <canvas id="coreCanvas" class="absolute inset-0"></canvas>
                 </div>
             </div>
-            <div class="mt-8 text-center">
-                <h1 class="font-headline text-headline-md text-secondary tracking-[0.3em] uppercase hud-glow-secondary font-light">KALKI</h1>
-                <div id="transcriptText" class="text-[10px] text-primary tracking-[0.2em] block mt-4 opacity-50 h-4"></div>
+            <div class="mt-8 text-center w-full max-w-md">
+                <h1 class="font-headline text-headline-md text-secondary tracking-[0.3em] uppercase hud-glow-secondary font-light mb-4">KALKI</h1>
+                <div class="relative group">
+                    <input type="text" id="cmdInput" placeholder="ENTER COMMAND, SIR..." class="w-full bg-surface/20 border border-primary/10 rounded-lg py-3 px-4 text-primary text-xs tracking-[0.2em] focus:outline-none focus:border-primary/40 focus:bg-surface/40 transition-all duration-300 placeholder:text-primary/20 backdrop-blur-md">
+                    <div id="transcriptText" class="text-[10px] text-primary tracking-[0.2em] block mt-4 opacity-50 h-4"></div>
+                </div>
             </div>
         </div>
 

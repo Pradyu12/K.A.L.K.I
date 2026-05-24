@@ -73,10 +73,15 @@ async def handle_command(req: CommandRequest):
 
     # 1. Task Management
     if any(word in cmd_lower for word in ["task", "mission", "to do", "todo"]):
-        if any(word in cmd_lower for word in ["add", "create", "new"]):
+        if any(word in cmd_lower for word in ["add", "create", "new", "record"]):
             intent = "task_add"
-            # Basic extraction - in a real app we'd use Gemini to extract the title
-            title = transcript.split("add task")[-1].strip() if "add task" in cmd_lower else transcript
+            # Basic extraction
+            if "add task" in cmd_lower: title = transcript.split("add task")[-1].strip()
+            elif "create mission" in cmd_lower: title = transcript.split("create mission")[-1].strip()
+            elif "new task" in cmd_lower: title = transcript.split("new task")[-1].strip()
+            else: title = transcript.replace("task", "").replace("mission", "").strip()
+
+            if not title: title = "Unspecified Mission"
             await database.add_task(title)
             response_text = f"The mission has been recorded in the log, sir: {title}"
         elif any(word in cmd_lower for word in ["list", "show", "get"]):
@@ -92,21 +97,23 @@ async def handle_command(req: CommandRequest):
             response_text = "How shall I manage your missions today, sir?"
 
     # 2. File Management
-    elif any(word in cmd_lower for word in ["file", "directory", "folder", "list files"]):
+    elif any(word in cmd_lower for word in ["file", "directory", "folder", "archive", "workspace"]):
         intent = "files"
-        if "list" in cmd_lower:
+        if any(word in cmd_lower for word in ["list", "show", "browse"]):
             files = os.listdir('.')
             files_str = ", ".join(files[:20])
             response_text = f"Scanning directory, sir. Found: {files_str}"
-        elif "search" in cmd_lower or "find" in cmd_lower:
-            query = transcript.split("find")[-1].strip()
-            found = glob.glob(f"**/*{query}*", recursive=True)
+        elif any(word in cmd_lower for word in ["search", "find", "locate"]):
+            query = transcript.split("find")[-1].strip() if "find" in cmd_lower else transcript.split("search")[-1].strip()
+            if not query or query == transcript: query = "*"
+            found = [f for f in glob.glob(f"**/*{query}*", recursive=True) if os.path.isfile(f)]
             if found:
-                response_text = f"Archives searched, sir. Located {len(found)} relevant files."
+                files_found = ", ".join(found[:5])
+                response_text = f"Archives searched, sir. Located {len(found)} relevant files, including: {files_found}"
             else:
                 response_text = "My search of the archives yielded no results, sir."
         else:
-            response_text = "Archive access established, sir. What is your command regarding the files?"
+            response_text = "Archive access established, sir. What is your command regarding the workspace?"
 
     # 3. Email Management
     elif any(word in cmd_lower for word in ["mail", "email", "message"]):

@@ -5,6 +5,7 @@
 const stateClasses = ['state-idle', 'state-listening', 'state-processing', 'state-speaking'];
 const statusText = document.getElementById('statusText');
 const transcriptDisplay = document.getElementById('transcriptText');
+const cmdInput = document.getElementById('cmdInput');
 const arcReactor = document.getElementById('arcReactor');
 const responseOverlay = document.getElementById('kalkiResponse');
 const terminalLogs = document.getElementById('terminalLogs');
@@ -178,6 +179,17 @@ const startListening = async () => {
 
 if (document.getElementById('btnListen')) document.getElementById('btnListen').addEventListener('click', startListening);
 if (document.getElementById('btnListenMobile')) document.getElementById('btnListenMobile').addEventListener('click', startListening);
+
+if (cmdInput) {
+    cmdInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && cmdInput.value.trim()) {
+            const cmd = cmdInput.value.trim();
+            cmdInput.value = '';
+            if (transcriptDisplay) transcriptDisplay.innerText = cmd;
+            processCommand(cmd);
+        }
+    });
+}
 
 if (document.getElementById('btnSimulate')) {
     document.getElementById('btnSimulate').addEventListener('click', () => {
