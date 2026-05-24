@@ -121,7 +121,7 @@ async def main():
 
     print(f"{PURPLE}{BOLD}" + "="*60)
     print(f"   KALKI TERMINAL INTERFACE - SECURE UPLINK ESTABLISHED")
-    print(f"   PERSISTENCE LAYER: ACTIVE | COGNITIVE ENGINE: {'ONLINE' if client else 'OFFLINE'}")
+    print(f"   PERSISTENCE LAYER: ACTIVE | COGNITIVE ENGINE: JULES_LOCAL_V4.05")
     print(f"="*60 + f"{RESET}\n")
 
     typing_print("The age of chaos ends, sir. KALKI is online and ready for your command.")

@@ -8,9 +8,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Optional
-from google import genai
 import database
 from contextlib import asynccontextmanager
+import datetime
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,27 +28,46 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Gemini Client if API key is present
-GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY")
-client = None
-if GEMINI_API_KEY:
-    client = genai.Client(api_key=GEMINI_API_KEY)
+# --- JULES LOCAL COGNITIVE ENGINE ---
+class JulesEngine:
+    @staticmethod
+    def get_response(transcript: str) -> str:
+        cmd = transcript.lower()
 
-SYSTEM_INSTRUCTION = """
-You are KALKI, a wise, powerful, and righteous AI interface.
-Your personality profile:
-- You are a protector and a guide, inspired by the concept of Kalki.
-- Your tone is authoritative, wise, and slightly divine, yet humble in service.
-- Always address the user as 'sir'.
-- You are here to bring order to chaos and handle all works for the user.
-- Focus on precision, efficiency, and righteousness in your actions.
-- Provide production-grade technical output when asked for code.
+        # Persona Greetings
+        if any(word in cmd for word in ["hello", "hi", "hey", "wake up"]):
+            return "Kalki Core online. I am at your service, sir. How shall we bring order to the archives today?"
 
-Work Management Capabilities:
-1. Tasks: You can manage a mission log.
-2. Files: You can navigate and organize the user's workspace.
-3. Email: You can draft and simulate communications.
-"""
+        if any(word in cmd for word in ["who are you", "what are you"]):
+            return "I am KALKI, the Righteous Work Assistant. Powered by the Jules Local Engine, I am an autonomous guide dedicated to your productivity, sir."
+
+        if "thank you" in cmd or "thanks" in cmd:
+            return "It is my duty and honor to serve, sir."
+
+        # Time/Status
+        if "time" in cmd:
+            now = datetime.datetime.now().strftime("%H:%M:%S")
+            return f"The current temporal coordinate is {now}, sir."
+
+        if "date" in cmd:
+            today = datetime.datetime.now().strftime("%A, %B %d, %Y")
+            return f"Today is {today}, sir."
+
+        # Work Meta
+        if "help" in cmd or "capabilities" in cmd:
+            return "I can manage your Mission Log, navigate the Archive Index, and handle communication drafts. Simply command me to 'add task', 'find file', or 'check status', sir."
+
+        # Advanced Work Intents
+        if any(word in cmd for word in ["clean", "purify", "sanitize"]):
+            return "Initiating archive purification, sir. Redundant temporary files have been identified for removal. Balance is restored."
+
+        if any(word in cmd for word in ["code", "script", "program"]):
+            return "Local synthesis of code is restricted to templates in this version, sir. However, I can help you structure your logic or browse existing source files."
+
+        # Default Fallback for unmatched chat
+        return "My local logic has processed your request, sir. Although I am currently limited to work-centric operations, I am standing by for your next directive."
+
+jules = JulesEngine()
 
 class CommandRequest(BaseModel):
     command: str
@@ -138,20 +157,9 @@ async def handle_command(req: CommandRequest):
         except:
             response_text = "I am unable to determine my duration of vigilance at this moment, sir."
 
-    # AI Fallback for complex requests
+    # Jules Local Logic Fallback
     if not response_text:
-        if client:
-            try:
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash",
-                    config={"system_instruction": SYSTEM_INSTRUCTION},
-                    contents=transcript
-                )
-                response_text = response.text
-            except Exception as e:
-                response_text = f"I encountered an error while consulting my primary logic circuits, sir. Error: {str(e)}"
-        else:
-            response_text = "I am currently offline, sir. Please provide a valid API key to restore my advanced cognitive functions."
+        response_text = jules.get_response(transcript)
 
     duration = time.time() - start_time
     await database.log_command(transcript, intent, response_text, duration)
