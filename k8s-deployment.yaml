@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: jarvis
-        image: jarvis:latest
-        imagePullPolicy: Never
+        image: ghcr.io/pradyu12/k-a-l-k-i:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
         env:

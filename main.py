@@ -1,6 +1,7 @@
 import os
 import time
 import subprocess
+import psutil
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -24,7 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY")
+GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY") or "AIzaSyCjZ2dTeEIxmMm2U88q64NNejxF8S5vQbo"
 client = None
 if GEMINI_API_KEY:
     client = genai.Client(api_key=GEMINI_API_KEY)
@@ -98,8 +99,12 @@ async def read_index():
 async def health_check():
     return {"status": "healthy", "service": "jarvis"}
 
-@app.get("/style.css")
+@app.get("/style_new.css")
 async def read_css():
+    return FileResponse("style_new.css")
+
+@app.get("/style.css")
+async def read_css_old():
     return FileResponse("style.css")
 
 @app.get("/app.js")
@@ -127,11 +132,31 @@ async def api_clear_logs():
 @app.get("/api/v1/stats")
 async def api_stats():
     logs = await get_recent_logs(1000)
-    intents = {}
-    for l in logs:
-        pass
     return {
         "status": "success",
         "total_commands": len(logs),
+        "service": "jarvis"
+    }
+
+@app.get("/api/v1/metrics")
+async def api_metrics():
+    cpu = psutil.cpu_percent(interval=0.5)
+    mem = psutil.virtual_memory()
+    disk = psutil.disk_usage("/")
+    net = psutil.net_io_counters()
+    uptime_sec = time.time() - psutil.boot_time()
+    uptime_str = f"{int(uptime_sec // 86400)}d {int((uptime_sec % 86400) // 3600)}h {int((uptime_sec % 3600) // 60)}m"
+    return {
+        "status": "success",
+        "cpu": round(cpu, 1),
+        "memory": round(mem.percent, 1),
+        "memory_used_gb": round(mem.used / (1024**3), 2),
+        "memory_total_gb": round(mem.total / (1024**3), 2),
+        "disk": round(disk.percent, 1),
+        "disk_used_gb": round(disk.used / (1024**3), 2),
+        "disk_total_gb": round(disk.total / (1024**3), 2),
+        "net_sent_mb": round(net.bytes_sent / (1024**2), 2),
+        "net_recv_mb": round(net.bytes_recv / (1024**2), 2),
+        "uptime": uptime_str,
         "service": "jarvis"
     }

@@ -3,40 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. HUD</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>K.A.L.K.I - Holographic Interface</title>
+    <link rel="stylesheet" href="style_new.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body class="state-idle">
-    <div class="background-overlay"></div>
+    <canvas id="particleCanvas"></canvas>
+    <div class="scan-line-overlay"></div>
+    <div class="holographic-flicker"></div>
 
     <header class="hud-header">
-        <img src="logo.svg" alt="JARVIS Logo" class="main-logo">
+        <img src="logo.svg" alt="KALKI" class="main-logo">
+        <div class="header-clock" id="headerClock">00:00:00</div>
     </header>
 
     <main class="hud-container">
-        <!-- Left Telemetry -->
-        <section class="panel side-panel left-panel">
-            <div class="panel-header">SYSTEM_METRICS</div>
-            <div class="metric-group">
-                <div class="metric-label">CPU_LOAD</div>
-                <div class="progress-bar"><div class="bar" style="width: 14%;"></div></div>
+        <!-- Left Panel: System Metrics -->
+        <section class="panel left-panel">
+            <div class="panel-header">
+                <span class="dot"></span>
+                <span>SYSTEM_TELEMETRY</span>
+                <span class="panel-badge" id="uptimeBadge">ONLINE</span>
             </div>
-            <div class="metric-group">
-                <div class="metric-label">MEM_ALLOC</div>
-                <div class="progress-bar"><div class="bar" style="width: 32%;"></div></div>
+
+            <div class="gauge-row">
+                <div class="radial-gauge" id="cpuGauge">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" class="gauge-bg"/>
+                        <circle cx="60" cy="60" r="50" class="gauge-fill" id="cpuArc"/>
+                        <text x="60" y="55" text-anchor="middle" class="gauge-value" id="cpuVal">0</text>
+                        <text x="60" y="75" text-anchor="middle" class="gauge-label">CPU</text>
+                    </svg>
+                </div>
+                <div class="radial-gauge" id="memGauge">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" class="gauge-bg"/>
+                        <circle cx="60" cy="60" r="50" class="gauge-fill" id="memArc"/>
+                        <text x="60" y="55" text-anchor="middle" class="gauge-value" id="memVal">0</text>
+                        <text x="60" y="75" text-anchor="middle" class="gauge-label">MEM</text>
+                    </svg>
+                </div>
+                <div class="radial-gauge" id="diskGauge">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" class="gauge-bg"/>
+                        <circle cx="60" cy="60" r="50" class="gauge-fill" id="diskArc"/>
+                        <text x="60" y="55" text-anchor="middle" class="gauge-value" id="diskVal">0</text>
+                        <text x="60" y="75" text-anchor="middle" class="gauge-label">DISK</text>
+                    </svg>
+                </div>
             </div>
-            <div class="metric-group">
-                <div class="metric-label">NET_TRAFFIC</div>
-                <div class="network-graph" id="networkGraph"></div>
+
+            <div class="panel-header" style="margin-top:12px;">
+                <span class="dot"></span>
+                <span>COMMAND_LOG</span>
             </div>
             <div class="log-container" id="terminalLogs">
-                <div class="log-entry">> INITIALIZING J.A.R.V.I.S. CORE...</div>
-                <div class="log-entry">> SECURE LINK ESTABLISHED</div>
+                <div class="log-entry">&gt; INITIALIZING K.A.L.K.I. CORE...</div>
+                <div class="log-entry">&gt; HOLOGRAPHIC INTERFACE ACTIVE</div>
+                <div class="log-entry">&gt; SECURE LINK ESTABLISHED</div>
             </div>
         </section>
 
-        <!-- Central Core -->
+        <!-- Center: Holographic Core -->
         <section class="central-core">
             <div class="arc-reactor" id="arcReactor">
                 <div class="ring ring-outer"></div>
@@ -46,38 +74,82 @@
                 <div class="core-glow"></div>
                 <canvas id="coreCanvas"></canvas>
             </div>
+
+            <div class="waveform-ring" id="waveformRing">
+                <canvas id="waveformCanvas"></canvas>
+            </div>
+
             <div class="status-text" id="statusText">SYSTEM READY</div>
             <div class="transcript" id="transcriptText"></div>
+
+            <div class="hologram-projection" id="hologramProjection">
+                <canvas id="globeCanvas"></canvas>
+            </div>
         </section>
 
-        <!-- Right Telemetry -->
-        <section class="panel side-panel right-panel">
-            <div class="panel-header">NETWORK_TOPOLOGY</div>
+        <!-- Right Panel: Network & Security -->
+        <section class="panel right-panel">
+            <div class="panel-header">
+                <span class="dot"></span>
+                <span>NETWORK_TOPOLOGY</span>
+            </div>
             <div class="topology-container">
-                <svg id="topologySvg" viewBox="0 0 200 150">
-                    <circle cx="100" cy="75" r="5" fill="#00f0ff" />
-                    <line x1="100" y1="75" x2="60" y2="40" stroke="#00f0ff" stroke-width="0.5" opacity="0.5" />
-                    <line x1="100" y1="75" x2="140" y2="40" stroke="#00f0ff" stroke-width="0.5" opacity="0.5" />
-                    <line x1="100" y1="75" x2="100" y2="120" stroke="#00f0ff" stroke-width="0.5" opacity="0.5" />
-                    <circle cx="60" cy="40" r="3" fill="#0055ff" />
-                    <circle cx="140" cy="40" r="3" fill="#0055ff" />
-                    <circle cx="100" cy="120" r="3" fill="#0055ff" />
+                <svg id="topologySvg" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="nodeGlow"><stop offset="0%" stop-color="#0ff" stop-opacity="1"/><stop offset="100%" stop-color="#0ff" stop-opacity="0"/></radialGradient>
+                    </defs>
+                    <circle cx="100" cy="75" r="6" fill="url(#nodeGlow)" opacity="0.8"/>
+                    <circle cx="100" cy="75" r="2" fill="#0ff"/>
+                    <g class="topo-node" data-angle="0"><circle cx="160" cy="75" r="4" fill="#90f" opacity="0.8"/><circle cx="160" cy="75" r="1.5" fill="#fff"/></g>
+                    <g class="topo-node" data-angle="72"><circle cx="130" cy="107" r="4" fill="#90f" opacity="0.8"/><circle cx="130" cy="107" r="1.5" fill="#fff"/></g>
+                    <g class="topo-node" data-angle="144"><circle cx="70" cy="107" r="4" fill="#90f" opacity="0.8"/><circle cx="70" cy="107" r="1.5" fill="#fff"/></g>
+                    <g class="topo-node" data-angle="216"><circle cx="40" cy="75" r="4" fill="#90f" opacity="0.8"/><circle cx="40" cy="75" r="1.5" fill="#fff"/></g>
+                    <g class="topo-node" data-angle="288"><circle cx="70" cy="43" r="4" fill="#90f" opacity="0.8"/><circle cx="70" cy="43" r="1.5" fill="#fff"/></g>
+                    <g class="topo-node" data-angle="360"><circle cx="130" cy="43" r="4" fill="#90f" opacity="0.8"/><circle cx="130" cy="43" r="1.5" fill="#fff"/></g>
+                    <line x1="100" y1="75" x2="160" y2="75" class="topo-link"/>
+                    <line x1="100" y1="75" x2="130" y2="107" class="topo-link"/>
+                    <line x1="100" y1="75" x2="70" y2="107" class="topo-link"/>
+                    <line x1="100" y1="75" x2="40" y2="75" class="topo-link"/>
+                    <line x1="100" y1="75" x2="70" y2="43" class="topo-link"/>
+                    <line x1="100" y1="75" x2="130" y2="43" class="topo-link"/>
                 </svg>
             </div>
 
-            <div class="panel-header">SECURITY_PROTOCOL</div>
+            <div class="panel-header">
+                <span class="dot"></span>
+                <span>DATA_STREAM</span>
+            </div>
+            <div class="data-stream" id="dataStream">
+                <div class="stream-content" id="streamContent"></div>
+            </div>
+
+            <div class="panel-header">
+                <span class="dot"></span>
+                <span>SECURITY_PROTOCOL</span>
+            </div>
             <div class="firewall-grid">
                 <div class="scan-line"></div>
             </div>
-            <div class="security-status">
-                <span class="label">FIREWALL:</span> <span class="status-active">ACTIVE</span>
+            <div class="security-row">
+                <span class="sec-label">FIREWALL:</span>
+                <span class="sec-value">ACTIVE</span>
             </div>
-            <div class="security-status">
-                <span class="label">ENCRYPTION:</span> <span class="status-active">AES-256</span>
+            <div class="security-row">
+                <span class="sec-label">ENCRYPTION:</span>
+                <span class="sec-value">AES-256</span>
             </div>
+            <div class="security-row">
+                <span class="sec-label">THREATS:</span>
+                <span class="sec-value" id="threatCount">0</span>
+            </div>
+
             <div class="panel-footer">
-                <button id="btnListen" class="fui-button">INITIATE VOICE</button>
-                <button id="btnSimulate" class="fui-button secondary">MOCK COMMAND</button>
+                <button id="btnListen" class="fui-button">
+                    <span class="btn-icon">&#9835;</span> INITIATE VOICE
+                </button>
+                <button id="btnSimulate" class="fui-button secondary">
+                    <span class="btn-icon">&#9881;</span> MOCK COMMAND
+                </button>
             </div>
         </section>
     </main>
