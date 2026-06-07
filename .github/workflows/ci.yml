@@ -70,19 +70,24 @@ jobs:
         with:
           version: latest
       - name: Configure Kubeconfig
-        if: secrets.KUBE_CONFIG_DATA != ''
         run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
+          if [ -n "${{ secrets.KUBE_CONFIG_DATA }}" ]; then
+            mkdir -p $HOME/.kube
+            echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
+            chmod 600 $HOME/.kube/config
+          fi
       - name: Update k8s image tag
         run: |
           IMAGE_TAG="${{ steps.build-and-push.outputs.image }}"
           sed -i "s|image:.*|image: ${IMAGE_TAG}|" k8s-deployment.yaml
       - name: Deploy to Kubernetes
-        if: secrets.KUBE_CONFIG_DATA != ''
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
-          kubectl apply -k . || kubectl apply -f k8s-secret.yaml -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-ingress.yaml
+          if kubectl apply -k . 2>/dev/null; then
+            :
+          else
+            kubectl apply -f k8s-secret.yaml -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-ingress.yaml
+          fi
           kubectl rollout status deployment/sudarshana-deployment -n sudarshana-system --timeout=120s
       - name: Deployment summary
         run: |
