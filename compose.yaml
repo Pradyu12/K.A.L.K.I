@@ -1,10 +1,12 @@
 services:
-  standardschemaspec:
-    image: standardschemaspec
+  sudarshana:
+    image: sudarshana:latest
     build:
-      context: .kilo/node_modules/@standard-schema/spec
-      dockerfile: ./Dockerfile
+      context: .
+      dockerfile: Dockerfile
     environment:
-      NODE_ENV: production
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
     ports:
-      - 3000:3000
+      - "8000:8000"
+    volumes:
+      - .env:/app/.env

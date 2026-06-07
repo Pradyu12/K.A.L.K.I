@@ -7,4 +7,4 @@ resources:
   - k8s-service.yaml
   - k8s-ingress.yaml
 
-namespace: jarvis-system
+namespace: sudarshana-system

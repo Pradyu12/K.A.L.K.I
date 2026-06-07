@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: jarvis-service
+  name: sudarshana-service
   labels:
-    app: jarvis
+    app: sudarshana
 spec:
   selector:
-    app: jarvis
+    app: sudarshana
   ports:
   - protocol: TCP
     port: 80

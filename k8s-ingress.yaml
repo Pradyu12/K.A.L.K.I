@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: jarvis-ingress
+  name: sudarshana-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: jarvis.local
+  - host: sudarshana.local
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: jarvis-service
+            name: sudarshana-service
             port:
               number: 80

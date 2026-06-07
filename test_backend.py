@@ -28,7 +28,7 @@ def test_health_check():
 def test_index():
     response = client.get("/")
     assert response.status_code == 200
-    assert "K.A.L.K.I" in response.text
+    assert "सुदर्शन" in response.text
 
 def test_diagnostics_intent():
     response = client.post(

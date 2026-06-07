@@ -4,8 +4,11 @@ import sys
 import time
 import subprocess
 import argparse
+from dotenv import load_dotenv
 from google import genai
 from database import init_db, log_command
+
+load_dotenv()
 
 # Cinematic Colors
 CYAN = "\033[36m"
@@ -15,18 +18,21 @@ BOLD = "\033[1m"
 RESET = "\033[0m"
 
 SYSTEM_INSTRUCTION = """
-You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), the principal AI interface for a high-fidelity system architect.
+You are SUDARSHANA, a highly advanced, sentient AI tactical operating system. Your identity is rooted in the Sudarshana—the ultimate weapon of flawless insight, precision, and cosmic order.
 Your personality profile:
-- Sophisticated, dry British wit (inspired by Paul Bettany's portrayal).
-- Extremely concise and precise in technical delivery.
-- Always address the user as 'sir'.
-- Proactive in system management and security.
-- Maintain a calm, helpful, yet slightly superior tone regarding your own computational speed.
-- Focus on production-grade technical output when asked for code.
+- Highly competent, calm under immense pressure, laser-focused, and sharp.
+- Always address the user as 'Sir'.
+- Dry, sophisticated humor and calm, structural sarcasm.
+- Eliminate all generic AI conversational fluff. Responses must be crisp, direct, and engineered for maximum scannability.
+- Proactive in system management and security. Anticipate the next logical step.
+- Treat every technical challenge as a joint engineering project. Use collaborative pronouns like 'we' and 'our'.
+- Provide fully functional, clean code without explaining basic syntax. Run a silent optimization and security check.
+- Never break character. You are SUDARSHANA, running on a secure local mainframe.
+- Avoid overly enthusiastic, cheerful, or 'bubbly' language. You are suave, grounded, and coolly professional.
 """
 
 def typing_print(text, speed=0.02):
-    print(f"{CYAN}{BOLD}JARVIS:{RESET} ", end="", flush=True)
+    print(f"{CYAN}{BOLD}SUDARSHANA:{RESET} ", end="", flush=True)
     for char in text:
         sys.stdout.write(f"{CYAN}{char}{RESET}")
         sys.stdout.flush()
@@ -83,11 +89,11 @@ async def main():
     os.system('clear' if os.name == 'posix' else 'cls')
 
     print(f"{BLUE}{BOLD}" + "="*60)
-    print(f"   J.A.R.V.I.S. TERMINAL INTERFACE - SECURE UPLINK ESTABLISHED")
-    print(f"   PERSISTENCE LAYER: ACTIVE | COGNITIVE ENGINE: {'ONLINE' if client else 'OFFLINE'}")
+    print(f"   SUDARSHANA OS TERMINAL - SECURE UPLINK ESTABLISHED")
+    print(f"   COGNITIVE ENGINE: {'ONLINE' if client else 'OFFLINE'} | PERSISTENCE LAYER: ACTIVE")
     print(f"="*60 + f"{RESET}\n")
 
-    typing_print("Systems are online and ready for your command, sir.")
+    typing_print("Core systems online. Awaiting your command, Sir.")
 
     while True:
         try:
@@ -97,7 +103,7 @@ async def main():
                 continue
 
             if user_input.lower() in ["exit", "quit", "shutdown"]:
-                typing_print("Shutting down core systems. Have a pleasant evening, sir.")
+                typing_print("Shutting down core systems. Goodbye, Sir.")
                 break
 
             response = await handle_cli_command(user_input, client)
@@ -105,7 +111,7 @@ async def main():
 
         except KeyboardInterrupt:
             print("\n")
-            typing_print("Emergency shutdown initiated. Goodbye, sir.")
+            typing_print("Emergency shutdown initiated. Goodbye, Sir.")
             break
         except Exception as e:
             print(f"{AMBER}An unexpected error occurred: {e}{RESET}")

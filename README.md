@@ -1,4 +1,4 @@
-# J.A.R.V.I.S. System Core
+# SUDARSHANA OS — Mainframe
 
 Cinematic FUI HUD and Intelligent AI Backend.
 
@@ -7,7 +7,7 @@ Cinematic FUI HUD and Intelligent AI Backend.
 1. Install: `pip install -r requirements.txt`
 2. Run Backend: `uvicorn main:app --host 0.0.0.0 --port 8000`
 3. View HUD: `http://localhost:8000`
-4. Run CLI: `python3 jarvis_cli.py` (requires `GOOGLE_API_KEY` for full cognitive functions)
+4. Run CLI: `python3 sudarshana_cli.py` (requires `GOOGLE_API_KEY` for full cognitive functions)
 
 ## Kubernetes Deployment
 
@@ -18,10 +18,10 @@ Cinematic FUI HUD and Intelligent AI Backend.
 ### Deploy
 ```bash
 # Build Docker image
-docker build -t jarvis:latest .
+docker build -t sudarshana:latest .
 
 # Update the secret with your Google API key
-kubectl create namespace jarvis-system
+kubectl create namespace sudarshana-system
 kubectl apply -k .
 
 # Or deploy individual files
@@ -33,9 +33,9 @@ kubectl apply -f k8s-ingress.yaml
 
 ### Verify
 ```bash
-kubectl get pods -n jarvis-system
-kubectl get services -n jarvis-system
-kubectl port-forward svc/jarvis-service 8080:80 -n jarvis-system
+kubectl get pods -n sudarshana-system
+kubectl get services -n sudarshana-system
+kubectl port-forward svc/sudarshana-service 8080:80 -n sudarshana-system
 ```
 
 ## Production

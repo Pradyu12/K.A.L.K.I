@@ -1,28 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Noto+Sans:ital,wght@0,500;1,500&display=swap');
 
 :root {
-  --c-cyan: #0ff;
-  --c-blue: #06f;
-  --c-purple: #90f;
-  --c-alert: #f30;
-  --c-green: #0f8;
-  --bg-deep: #020210;
-  --bg-panel: rgba(4, 8, 30, 0.25);
-  --border-dim: rgba(0, 255, 255, 0.12);
-  --border-glow: rgba(0, 255, 255, 0.4);
-  --shadow-cyan: 0 0 15px rgba(0, 255, 255, 0.3);
-  --shadow-purple: 0 0 15px rgba(144, 0, 255, 0.2);
-  --text-cyan: rgba(0, 255, 255, 0.9);
+  --gold: #FFB300;
+  --gold-dim: rgba(255, 179, 0, 0.4);
+  --gold-pale: #FFD54F;
+  --amber: #FF8F00;
+  --amber-dim: rgba(255, 143, 0, 0.3);
+  --cyan: #0ff;
+  --cyan-dim: rgba(0, 255, 255, 0.15);
+  --blue: #06f;
+  --mint: #B2FFE0;
+  --silver: #C0C0C0;
+  --obsidian: #0B0F12;
+  --panel-bg: rgba(11, 15, 18, 0.65);
+  --border-dim: rgba(255, 179, 0, 0.1);
+  --border-glow: rgba(255, 179, 0, 0.35);
+  --shadow-gold: 0 0 20px rgba(255, 179, 0, 0.25);
+  --shadow-cyan: 0 0 15px rgba(0, 255, 255, 0.15);
+  --text-primary: var(--mint);
+  --text-dim: rgba(192, 192, 192, 0.5);
   --ui-font: 'Rajdhani', sans-serif;
   --tech-font: 'Share Tech Mono', monospace;
+  --sanskrit-font: 'Noto Sans', serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   min-height: 100vh;
-  background: var(--bg-deep);
-  color: var(--c-cyan);
+  background: var(--obsidian);
+  color: var(--text-primary);
   font-family: var(--ui-font);
   overflow: hidden;
   display: flex;
@@ -31,15 +38,34 @@ body {
   user-select: none;
 }
 
-/* Particle canvas behind everything */
-#particleCanvas {
+/* ─── Mandala Background ─── */
+.mandala-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  opacity: 0.06;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 30%, rgba(255, 179, 0, 0.15) 31%, transparent 32%),
+    radial-gradient(circle at 50% 50%, transparent 38%, rgba(255, 179, 0, 0.1) 39%, transparent 40%),
+    radial-gradient(circle at 50% 50%, transparent 46%, rgba(255, 179, 0, 0.08) 47%, transparent 48%),
+    radial-gradient(circle at 50% 50%, transparent 54%, rgba(0, 255, 255, 0.06) 55%, transparent 56%),
+    radial-gradient(circle at 50% 50%, transparent 62%, rgba(255, 179, 0, 0.05) 63%, transparent 64%),
+    repeating-conic-gradient(rgba(255, 179, 0, 0.03) 0% 1%, transparent 1% 2%);
+  animation: mandalaSpin 60s linear infinite;
+}
+@keyframes mandalaSpin {
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(360deg) scale(1); }
 }
 
-/* Scan line overlay */
+#particleCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
 .scan-line-overlay {
   position: fixed;
   inset: 0;
@@ -49,12 +75,11 @@ body {
     0deg,
     transparent,
     transparent 2px,
-    rgba(0, 255, 255, 0.015) 2px,
-    rgba(0, 255, 255, 0.015) 4px
+    rgba(255, 179, 0, 0.012) 2px,
+    rgba(255, 179, 0, 0.012) 4px
   );
 }
 
-/* Holographic flicker */
 .holographic-flicker {
   position: fixed;
   inset: 0;
@@ -65,14 +90,14 @@ body {
 }
 @keyframes flicker {
   0%, 100% { opacity: 0; }
-  3% { opacity: 0.03; background: rgba(0,255,255,0.02); }
+  3% { opacity: 0.03; background: rgba(255,179,0,0.02); }
   4% { opacity: 0; }
   45% { opacity: 0; }
-  48% { opacity: 0.02; background: rgba(144,0,255,0.01); }
+  48% { opacity: 0.02; background: rgba(0,255,255,0.01); }
   49% { opacity: 0; }
 }
 
-/* Header */
+/* ─── Header ─── */
 .hud-header {
   position: fixed;
   top: 20px;
@@ -83,54 +108,92 @@ body {
   justify-content: space-between;
   align-items: center;
 }
-.main-logo {
-  width: 50px;
-  height: 50px;
-  opacity: 0.85;
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sanskrit-mark {
+  font-family: var(--sanskrit-font);
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(255, 179, 0, 0.4), 0 0 40px rgba(255, 179, 0, 0.2);
+  letter-spacing: 2px;
+}
+.brand-divider {
+  color: var(--gold-dim);
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
+.brand-sub {
+  font-family: var(--tech-font);
+  font-size: 0.7rem;
+  color: var(--silver);
+  letter-spacing: 4px;
+  opacity: 0.6;
+}
+.header-accents {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.status-pip {
+  font-family: var(--tech-font);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(255, 179, 0, 0.5);
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 179, 0, 0.2);
+  border-radius: 4px;
 }
 .header-clock {
   font-family: var(--tech-font);
-  font-size: 1.2rem;
-  color: var(--c-cyan);
-  text-shadow: 0 0 10px var(--c-cyan);
+  font-size: 1.1rem;
+  color: var(--cyan);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   letter-spacing: 3px;
   opacity: 0.7;
 }
 
-/* Layout */
+/* ─── Layout ─── */
 .hud-container {
   display: grid;
-  grid-template-columns: 320px 1fr 320px;
+  grid-template-columns: 300px 1fr 300px;
   width: 98vw;
-  height: 88vh;
-  gap: 24px;
+  height: 86vh;
+  gap: 20px;
   margin-top: 50px;
-  padding: 0 16px;
+  padding: 0 14px;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
-/* Holographic Panels */
+/* ─── Panels ─── */
 .panel {
-  background: var(--bg-panel);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--panel-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border-dim);
-  border-top: 1px solid rgba(0, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 18px;
+  border-top: 1px solid rgba(255, 179, 0, 0.15);
+  border-radius: 10px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
   transition: border-color 0.5s, box-shadow 0.5s;
-  box-shadow: inset 0 0 30px rgba(0, 255, 255, 0.03), 0 8px 32px rgba(0,0,0,0.5);
+  box-shadow: inset 0 0 30px rgba(255, 179, 0, 0.02), 0 8px 32px rgba(0,0,0,0.5);
 }
 .panel::before {
   content: '';
   position: absolute;
-  top: 0; left: -100%; width: 60%; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--c-cyan), transparent);
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
   animation: edgeSweep 6s ease-in-out infinite;
 }
 @keyframes edgeSweep {
@@ -140,65 +203,58 @@ body {
   100% { left: 120%; opacity: 0; }
 }
 .panel:hover {
-  border-color: rgba(0, 255, 255, 0.3);
-  box-shadow: var(--shadow-cyan), inset 0 0 40px rgba(0, 255, 255, 0.05);
+  border-color: rgba(255, 179, 0, 0.25);
+  box-shadow: var(--shadow-gold), inset 0 0 40px rgba(255, 179, 0, 0.03);
 }
 
 .panel-header {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 3px;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
-  border-bottom: 1px solid rgba(0,255,255,0.1);
-  margin-bottom: 14px;
-  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 179, 0, 0.08);
+  margin-bottom: 12px;
+  padding-bottom: 7px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
-.panel-header .dot {
-  width: 6px; height: 6px;
-  background: var(--c-cyan);
+.chakra-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--gold);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--c-cyan);
+  box-shadow: 0 0 10px var(--gold), 0 0 20px rgba(255, 179, 0, 0.3);
   animation: dotPulse 2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 @keyframes dotPulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--c-cyan); }
-  50% { opacity: 0.4; box-shadow: 0 0 2px var(--c-cyan); }
-}
-.panel-badge {
-  margin-left: auto;
-  font-size: 0.6rem;
-  font-weight: 500;
-  color: var(--c-green);
-  text-shadow: 0 0 8px var(--c-green);
-  letter-spacing: 2px;
-  font-family: var(--tech-font);
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px var(--gold); }
+  50% { opacity: 0.4; box-shadow: 0 0 3px var(--gold); }
 }
 
-/* Radial Gauges */
+/* ─── Gauges ─── */
 .gauge-row {
   display: flex;
   justify-content: space-around;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 4px;
+  margin-bottom: 6px;
 }
 .radial-gauge {
-  width: 90px;
-  height: 90px;
+  width: 82px;
+  height: 82px;
   flex-shrink: 0;
 }
 .radial-gauge svg { width: 100%; height: 100%; }
 .gauge-bg {
   fill: none;
-  stroke: rgba(0, 255, 255, 0.08);
+  stroke: rgba(255, 179, 0, 0.06);
   stroke-width: 6;
 }
 .gauge-fill {
   fill: none;
-  stroke: var(--c-cyan);
+  stroke: var(--gold);
   stroke-width: 6;
   stroke-linecap: round;
   stroke-dasharray: 314.16;
@@ -206,23 +262,79 @@ body {
   transform: rotate(-90deg);
   transform-origin: 60px 60px;
   transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 0 6px var(--c-cyan));
+  filter: drop-shadow(0 0 6px rgba(255, 179, 0, 0.5));
 }
 .gauge-value {
   fill: #fff;
   font-family: var(--tech-font);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
 }
 .gauge-label {
-  fill: rgba(255,255,255,0.4);
+  fill: rgba(255, 255, 255, 0.3);
   font-family: var(--ui-font);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 500;
   letter-spacing: 2px;
 }
 
-/* Central Core */
+/* ─── Log ─── */
+.log-container {
+  margin-top: auto;
+  font-size: 0.6rem;
+  font-family: var(--tech-font);
+  color: rgba(255, 255, 255, 0.35);
+  height: 110px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 7px 9px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 179, 0, 0.05);
+}
+.log-entry {
+  margin-bottom: 3px;
+  padding-left: 5px;
+  border-left: 2px solid rgba(255, 179, 0, 0.25);
+  animation: fadeIn 0.3s ease-out;
+}
+.log-entry:first-child {
+  color: var(--gold-pale);
+  font-weight: 600;
+  text-shadow: 0 0 6px rgba(255, 179, 0, 0.3);
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Chakra Blades (background decorative) ─── */
+.chakra-blades {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 700px;
+  height: 700px;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background:
+    repeating-conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(255, 179, 0, 0.35) 0.8deg,
+      transparent 1.6deg,
+      transparent 15deg
+    );
+  border-radius: 50%;
+  animation: chakraBladeSpin 40s linear infinite;
+}
+@keyframes chakraBladeSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ─── Central Core ─── */
 .central-core {
   display: flex;
   flex-direction: column;
@@ -239,139 +351,344 @@ body {
   justify-content: center;
   align-items: center;
   transition: transform 0.3s ease-out;
+  z-index: 1;
 }
+
 .ring {
   position: absolute;
   border-radius: 50%;
-  border: 2px solid transparent;
 }
-.ring-outer {
-  width: 310px; height: 310px;
-  border: 1px dashed rgba(0, 255, 255, 0.25);
-  animation: rotateClockwise 25s linear infinite;
+
+/* ─── Outer Serrated Blade Ring ───
+ *  24 precise blades using conic-gradient serrations.
+ *  Each blade: 3deg gold wedge + 12deg gap = 15deg cycle.
+ *  360/15 = 24 blades.
+ */
+.ring-blades-outer {
+  width: 300px;
+  height: 300px;
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 6deg,
+    var(--gold) 6deg,
+    rgba(255, 179, 0, 0.4) 7.5deg,
+    var(--gold) 9deg,
+    transparent 9deg,
+    transparent 15deg
+  );
+  mask: radial-gradient(circle at center,
+    transparent calc(50% - 4px),
+    black calc(50% - 3px),
+    black calc(50% + 3px),
+    transparent calc(50% + 4px)
+  );
+  -webkit-mask: radial-gradient(circle at center,
+    transparent calc(50% - 4px),
+    black calc(50% - 3px),
+    black calc(50% + 3px),
+    transparent calc(50% + 4px)
+  );
+  animation: rotateClockwise 30s linear infinite;
+  opacity: 0.7;
+  box-shadow: 0 0 20px rgba(255, 179, 0, 0.15);
 }
-.ring-middle-outer {
-  width: 270px; height: 270px;
-  border-left: 3px solid var(--c-blue);
-  border-right: 3px solid var(--c-blue);
+
+/* ─── Mid Blade Ring ───
+ *  18 gear-like teeth, counter-rotating.
+ */
+.ring-blades-mid {
+  width: 260px;
+  height: 260px;
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 6deg,
+    rgba(255, 179, 0, 0.5) 6deg,
+    var(--amber) 8deg,
+    transparent 8deg,
+    transparent 20deg
+  );
+  mask: radial-gradient(circle at center,
+    transparent calc(50% - 3px),
+    black calc(50% - 2px),
+    black calc(50% + 2px),
+    transparent calc(50% + 3px)
+  );
+  -webkit-mask: radial-gradient(circle at center,
+    transparent calc(50% - 3px),
+    black calc(50% - 2px),
+    black calc(50% + 2px),
+    transparent calc(50% + 3px)
+  );
+  animation: rotateCounterClockwise 22s linear infinite;
   opacity: 0.6;
-  animation: rotateCounterClockwise 14s linear infinite;
-  filter: drop-shadow(0 0 8px var(--c-blue));
+  filter: drop-shadow(0 0 10px rgba(255, 143, 0, 0.25));
 }
-.ring-middle {
-  width: 220px; height: 220px;
-  border: 3px solid rgba(0, 255, 255, 0.08);
-  border-top-color: var(--c-cyan);
-  border-bottom-color: var(--c-cyan);
-  animation: rotateClockwise 9s linear infinite;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.1);
+
+/* ─── Main Chakra Ring ───
+ *  8-fold symmetry, the primary chakra body.
+ */
+.ring-chakra {
+  width: 210px;
+  height: 210px;
+  border: 3px solid rgba(255, 179, 0, 0.1);
+  border-top-color: var(--gold);
+  border-bottom-color: var(--gold-pale);
+  border-left-color: rgba(255, 179, 0, 0.2);
+  border-right-color: rgba(255, 179, 0, 0.2);
+  animation: rotateClockwise 14s linear infinite;
+  box-shadow:
+    0 0 30px rgba(255, 179, 0, 0.2),
+    inset 0 0 30px rgba(255, 179, 0, 0.06),
+    0 0 60px rgba(255, 179, 0, 0.08);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
+/* ─── Chakra Spokes ───
+ *  Tapered wedges using conic gradient + radial mask.
+ *  8 spokes: 4deg gold fill, 41deg gap = 45deg cycle. 360/45 = 8 spokes.
+ *  Radial mask creates taper: visible only in a ring from 20%-85% radius.
+ */
+.chakra-spokes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 2deg,
+    rgba(255, 179, 0, 0.08) 2deg,
+    var(--gold) 6deg,
+    rgba(255, 179, 0, 0.6) 7deg,
+    transparent 7deg,
+    transparent 45deg
+  );
+  mask: radial-gradient(circle at center,
+    transparent 15%,
+    black 38%,
+    black 82%,
+    transparent 88%
+  );
+  -webkit-mask: radial-gradient(circle at center,
+    transparent 15%,
+    black 38%,
+    black 82%,
+    transparent 88%
+  );
+  animation: rotateClockwise 20s linear infinite;
+}
+
+/* ─── Chakra Hub ───
+ *  Precision concentric circles.
+ */
+.chakra-hub {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  z-index: 3;
+  border: 1px solid rgba(255, 179, 0, 0.25);
+  box-shadow:
+    0 0 15px rgba(255, 179, 0, 0.2),
+    inset 0 0 15px rgba(255, 179, 0, 0.1),
+    0 0 0 5px rgba(255, 179, 0, 0.04),
+    0 0 0 10px rgba(255, 179, 0, 0.02);
+  background: radial-gradient(circle at 45% 45%,
+    rgba(255, 255, 255, 0.3) 0%,
+    var(--gold-pale) 20%,
+    var(--gold) 50%,
+    rgba(255, 179, 0, 0.3) 80%,
+    transparent 100%
+  );
+}
+
+.chakra-hub::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 30px var(--gold);
+  animation: hubPulse 3s ease-in-out infinite;
+}
+@keyframes hubPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 30px var(--gold); transform: translate(-50%, -50%) scale(1); }
+  50% { box-shadow: 0 0 25px rgba(255, 255, 255, 0.6), 0 0 50px var(--gold); transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* ─── Inner Precision Ring ─── */
 .ring-inner {
-  width: 150px; height: 150px;
-  border: 2px double var(--c-cyan);
-  animation: rotateCounterClockwise 5s linear infinite;
-  opacity: 0.8;
+  width: 130px;
+  height: 130px;
+  border: 1px solid rgba(255, 179, 0, 0.15);
+  animation: rotateCounterClockwise 10s linear infinite;
+  opacity: 0.5;
+  box-shadow:
+    0 0 8px rgba(255, 179, 0, 0.1),
+    inset 0 0 8px rgba(255, 179, 0, 0.05),
+    0 0 0 3px rgba(255, 179, 0, 0.03);
 }
+
+.ring-inner::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 179, 0, 0.1);
+  animation: rotateClockwise 6s linear infinite;
+}
+
+/* ─── Core Radiance ─── */
 .core-glow {
   position: absolute;
-  width: 90px; height: 90px;
-  background: radial-gradient(circle, var(--c-cyan) 0%, rgba(0,255,255,0.15) 40%, rgba(144,0,255,0.05) 70%, transparent 80%);
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle,
+    var(--gold-pale) 0%,
+    var(--gold) 15%,
+    rgba(255, 179, 0, 0.3) 35%,
+    rgba(255, 143, 0, 0.08) 55%,
+    rgba(0, 255, 255, 0.02) 75%,
+    transparent 90%
+  );
   filter: blur(10px);
-  opacity: 0.7;
-  animation: pulseGlow 3s ease-in-out infinite;
+  opacity: 0.55;
+  animation: pulseGlow 4s ease-in-out infinite;
+  z-index: 0;
 }
 @keyframes pulseGlow {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.35); opacity: 0.85; }
+  0%, 100% { transform: scale(1); opacity: 0.45; }
+  50% { transform: scale(1.5); opacity: 0.8; }
 }
+
+.core-sanskrit {
+  position: absolute;
+  z-index: 4;
+  font-family: var(--sanskrit-font);
+  font-size: 1rem;
+  color: var(--gold-pale);
+  text-shadow: 0 0 25px rgba(255, 179, 0, 0.5), 0 0 50px rgba(255, 179, 0, 0.2);
+  opacity: 0.6;
+  pointer-events: none;
+  animation: sanskritPulse 4s ease-in-out infinite;
+}
+@keyframes sanskritPulse {
+  0%, 100% { opacity: 0.5; text-shadow: 0 0 25px rgba(255, 179, 0, 0.3); }
+  50% { opacity: 0.9; text-shadow: 0 0 40px rgba(255, 179, 0, 0.6), 0 0 70px rgba(255, 179, 0, 0.2); }
+}
+
 #coreCanvas {
-  width: 130px; height: 130px;
-  z-index: 2;
+  width: 100px;
+  height: 100px;
+  z-index: 5;
 }
+
 @keyframes rotateClockwise { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes rotateCounterClockwise { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
 
-/* Waveform Ring */
+/* ─── Waveform ─── */
 .waveform-ring {
   position: relative;
-  width: 350px; height: 60px;
-  margin-top: 8px;
-  opacity: 0.4;
+  width: 330px;
+  height: 50px;
+  margin-top: 6px;
+  opacity: 0.35;
   transition: opacity 0.5s;
+  z-index: 1;
 }
-.state-speaking .waveform-ring { opacity: 0.9; }
+.state-speaking .waveform-ring { opacity: 0.85; }
 #waveformCanvas { width: 100%; height: 100%; }
 
-/* Status & Transcript */
+/* ─── Status & Transcript ─── */
 .status-text {
-  margin-top: 16px;
-  font-size: 1.6rem;
+  margin-top: 14px;
+  z-index: 2;
+  font-size: 1.4rem;
   font-weight: 700;
-  letter-spacing: 10px;
-  color: #fff;
-  text-shadow: 0 0 15px var(--c-cyan), 0 0 30px var(--c-blue);
+  letter-spacing: 8px;
+  color: var(--gold-pale);
+  text-shadow: 0 0 15px rgba(255, 179, 0, 0.4), 0 0 30px rgba(255, 179, 0, 0.2);
   text-transform: uppercase;
   transition: all 0.3s;
 }
 .transcript {
-  margin-top: 10px;
-  color: rgba(255,255,255,0.6);
+  margin-top: 8px;
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.5);
   font-family: var(--tech-font);
-  font-size: 0.95rem;
-  height: 22px;
+  font-size: 0.85rem;
+  height: 20px;
   text-align: center;
-  max-width: 500px;
+  max-width: 480px;
 }
 
-/* Hologram Projection (3D Globe) */
+/* ─── 3D Globe ─── */
 .hologram-projection {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 380px; height: 380px;
+  width: 360px;
+  height: 360px;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.25;
+  opacity: 0.2;
 }
 #globeCanvas { width: 100%; height: 100%; }
 
-/* Topology */
+/* ─── Topology ─── */
 .topology-container {
-  height: 120px;
-  margin-bottom: 14px;
+  height: 110px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0,255,255,0.015);
-  border-radius: 8px;
-  border: 1px solid rgba(0,255,255,0.06);
+  background: rgba(255, 179, 0, 0.015);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 179, 0, 0.05);
 }
 #topologySvg { width: 100%; height: 100%; }
 .topo-link {
-  stroke: rgba(0, 255, 255, 0.2);
+  stroke: rgba(255, 179, 0, 0.15);
   stroke-width: 0.5;
   animation: linkPulse 3s ease-in-out infinite;
 }
 @keyframes linkPulse {
-  0%, 100% { stroke-opacity: 0.2; }
-  50% { stroke-opacity: 0.6; }
+  0%, 100% { stroke-opacity: 0.15; }
+  50% { stroke-opacity: 0.5; }
 }
 .topo-node { animation: nodeOrbit 20s linear infinite; transform-origin: 100px 75px; }
 
-/* Data Stream */
+/* ─── Data Stream ─── */
 .data-stream {
-  height: 100px;
-  background: rgba(0,0,0,0.3);
-  border-radius: 6px;
-  border: 1px solid rgba(0,255,255,0.06);
-  padding: 8px 10px;
+  height: 90px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 5px;
+  border: 1px solid rgba(255, 179, 0, 0.05);
+  padding: 6px 8px;
   overflow: hidden;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   font-family: var(--tech-font);
-  font-size: 0.6rem;
-  line-height: 1.4;
-  color: rgba(0, 255, 255, 0.3);
+  font-size: 0.55rem;
+  line-height: 1.3;
+  color: rgba(0, 255, 255, 0.25);
 }
 .stream-content {
   word-break: break-all;
@@ -379,30 +696,32 @@ body {
 }
 @keyframes streamScroll {
   0% { opacity: 1; }
-  50% { opacity: 0.8; }
+  50% { opacity: 0.75; }
 }
 
-/* Firewall Grid */
+/* ─── Firewall ─── */
 .firewall-grid {
-  height: 90px;
-  border: 1px solid rgba(0,255,255,0.1);
-  border-radius: 6px;
+  height: 80px;
+  border: 1px solid rgba(255, 179, 0, 0.08);
+  border-radius: 5px;
   position: relative;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   background-image:
-    linear-gradient(rgba(0,255,255,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,255,0.06) 1px, transparent 1px);
-  background-size: 12px 12px;
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+    linear-gradient(rgba(255,179,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,179,0,0.04) 1px, transparent 1px);
+  background-size: 10px 10px;
+  box-shadow: inset 0 0 12px rgba(0,0,0,0.5);
 }
 .scan-line {
   position: absolute;
-  top: 0; width: 100%; height: 2px;
-  background: #fff;
-  box-shadow: 0 0 12px 4px var(--c-cyan);
-  animation: scan 2.5s cubic-bezier(0.4,0,0.2,1) infinite;
-  opacity: 0.7;
+  top: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--gold);
+  box-shadow: 0 0 15px 5px rgba(255, 179, 0, 0.4);
+  animation: scan 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  opacity: 0.6;
 }
 @keyframes scan {
   0% { top: -5%; opacity: 0; }
@@ -413,31 +732,31 @@ body {
 .security-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   font-family: var(--tech-font);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
-.sec-label { color: rgba(255,255,255,0.4); }
-.sec-value { color: var(--c-cyan); font-weight: 600; text-shadow: 0 0 6px var(--c-cyan); }
+.sec-label { color: rgba(255, 255, 255, 0.35); }
+.sec-value { color: var(--gold); font-weight: 600; text-shadow: 0 0 6px rgba(255, 179, 0, 0.3); }
 
-/* Buttons */
+/* ─── Buttons ─── */
 .panel-footer {
   display: flex;
   gap: 8px;
   margin-top: auto;
-  padding-top: 12px;
+  padding-top: 10px;
 }
 .fui-button {
-  background: rgba(0, 255, 255, 0.06);
-  border: 1px solid rgba(0, 255, 255, 0.25);
-  color: var(--c-cyan);
-  padding: 10px 12px;
+  background: rgba(255, 179, 0, 0.05);
+  border: 1px solid rgba(255, 179, 0, 0.2);
+  color: var(--gold);
+  padding: 9px 10px;
   font-family: var(--ui-font);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   cursor: pointer;
   flex: 1;
-  border-radius: 6px;
+  border-radius: 5px;
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -451,110 +770,133 @@ body {
 .fui-button::before {
   content: '';
   position: absolute;
-  top: 0; left: -100%; width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent);
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 179, 0, 0.15), transparent);
   transition: left 0.5s ease;
 }
 .fui-button:hover::before { left: 100%; }
 .fui-button:hover {
-  background: rgba(0, 255, 255, 0.15);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  background: rgba(255, 179, 0, 0.12);
+  box-shadow: 0 0 20px rgba(255, 179, 0, 0.2);
   transform: translateY(-2px);
   color: #fff;
-  border-color: var(--c-cyan);
+  border-color: var(--gold);
 }
 .fui-button:active { transform: translateY(0); }
-.fui-button .btn-icon { font-size: 0.9rem; }
+.fui-button .btn-icon { font-size: 0.85rem; }
 .fui-button.secondary {
-  border-color: rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
 }
 .fui-button.secondary:hover {
-  border-color: rgba(255,255,255,0.4);
+  border-color: rgba(255, 255, 255, 0.25);
   color: #fff;
-  box-shadow: 0 0 15px rgba(255,255,255,0.15);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
 }
 
-/* Logs */
-.log-container {
-  margin-top: auto;
-  font-size: 0.65rem;
-  font-family: var(--tech-font);
-  color: rgba(255,255,255,0.4);
-  height: 120px;
-  overflow: hidden;
-  background: rgba(0,0,0,0.25);
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(0,255,255,0.06);
+/* ─── State Visual Cues ─── */
+.state-listening .ring-blades-outer {
+  animation-duration: 8s !important;
+  opacity: 0.9 !important;
+  box-shadow: 0 0 30px rgba(255, 143, 0, 0.3);
 }
-.log-entry {
-  margin-bottom: 3px;
-  padding-left: 6px;
-  border-left: 2px solid rgba(0, 255, 255, 0.3);
-  animation: fadeIn 0.3s ease-out;
+.state-listening .ring-blades-mid {
+  animation-duration: 6s !important;
+  opacity: 0.8 !important;
 }
-.log-entry:first-child { color: var(--c-cyan); font-weight: 600; }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateX(-6px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-/* State Visual Cues */
 .state-listening .ring-inner {
-  border-color: var(--c-alert) !important;
+  border-color: var(--amber) !important;
+  animation-duration: 0.3s !important;
+  box-shadow: 0 0 20px var(--amber);
+}
+.state-listening .ring-chakra {
   animation-duration: 0.4s !important;
-  box-shadow: 0 0 20px var(--c-alert);
+  border-top-color: var(--amber);
+  border-bottom-color: var(--amber);
+  box-shadow: 0 0 30px rgba(255, 143, 0, 0.3);
 }
 .state-listening .status-text {
-  color: var(--c-alert);
-  text-shadow: 0 0 20px var(--c-alert), 0 0 40px var(--c-alert);
+  color: var(--amber);
+  text-shadow: 0 0 20px var(--amber), 0 0 40px rgba(255, 143, 0, 0.5);
 }
-.state-processing .ring-middle {
-  animation-duration: 0.4s !important;
-  border-top-color: var(--c-alert);
-  border-bottom-color: var(--c-alert);
-  box-shadow: 0 0 40px var(--c-alert);
+.state-listening .chakra-hub {
+  box-shadow:
+    0 0 25px rgba(255, 143, 0, 0.4),
+    inset 0 0 25px rgba(255, 143, 0, 0.2),
+    0 0 0 5px rgba(255, 143, 0, 0.08);
+}
+
+.state-processing .ring-blades-outer {
+  animation-duration: 4s !important;
+  opacity: 1 !important;
+}
+.state-processing .ring-blades-mid {
+  animation-duration: 3s !important;
+}
+.state-processing .ring-chakra {
+  animation-duration: 0.3s !important;
+  border-top-color: var(--cyan);
+  border-bottom-color: var(--cyan);
+  box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+}
+.state-processing .chakra-spokes {
+  animation-duration: 6s !important;
 }
 .state-processing .arc-reactor { transform: scale(1.04); }
-.state-speaking .ring-middle {
+.state-processing .status-text {
+  color: var(--cyan);
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.5), 0 0 40px rgba(0, 255, 255, 0.3);
+}
+
+.state-speaking .ring-blades-outer {
+  animation-duration: 12s !important;
+  opacity: 0.5 !important;
+}
+.state-speaking .ring-chakra {
   border-top-color: #fff;
   border-bottom-color: #fff;
-  box-shadow: 0 0 50px #fff;
+  box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
   animation-duration: 2s;
 }
 .state-speaking .status-text {
   color: #fff;
-  text-shadow: 0 0 25px #fff, 0 0 50px var(--c-cyan);
+  text-shadow: 0 0 25px #fff, 0 0 50px rgba(255, 179, 0, 0.4);
+}
+.state-speaking .chakra-hub {
+  border-color: #fff;
+  box-shadow: 0 0 30px #fff, 0 0 0 5px rgba(255, 255, 255, 0.1);
 }
 
-/* Holographic Response Overlay */
+/* ─── Response Overlay ─── */
 .response-overlay {
   position: fixed;
-  bottom: 30px;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%) perspective(800px) rotateX(2deg);
-  max-width: 700px;
-  width: 85%;
-  background: rgba(0, 8, 25, 0.7);
-  border: 1px solid rgba(0, 255, 255, 0.2);
-  border-top: 2px solid var(--c-cyan);
-  border-radius: 10px;
-  padding: 24px 30px;
+  max-width: 650px;
+  width: 82%;
+  background: rgba(8, 12, 20, 0.75);
+  border: 1px solid rgba(255, 179, 0, 0.15);
+  border-top: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 20px 26px;
   display: none;
   z-index: 200;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
   box-shadow:
-    0 20px 60px rgba(0,0,0,0.8),
-    0 0 30px rgba(0, 255, 255, 0.15),
-    inset 0 1px 0 rgba(0, 255, 255, 0.1);
-  font-size: 1.15rem;
-  line-height: 1.6;
-  color: rgba(255,255,255,0.95);
+    0 20px 60px rgba(0,0,0,0.85),
+    0 0 30px rgba(255, 179, 0, 0.1),
+    inset 0 1px 0 rgba(255, 179, 0, 0.08);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
   font-family: var(--ui-font);
   font-weight: 400;
-  text-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  text-shadow: 0 0 8px rgba(255, 179, 0, 0.15);
   animation: hologramIn 0.5s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
 }
 @keyframes hologramIn {
@@ -570,19 +912,19 @@ body {
   }
 }
 .response-overlay::before {
-  content: '▲ K.A.L.K.I. RESPONSE';
+  content: '▲ SUDARSHANA RESPONSE';
   position: absolute;
-  top: -22px;
-  left: 20px;
-  font-size: 0.6rem;
+  top: -20px;
+  left: 18px;
+  font-size: 0.55rem;
   font-family: var(--tech-font);
-  color: var(--c-cyan);
+  color: var(--gold);
   letter-spacing: 3px;
-  opacity: 0.7;
-  text-shadow: 0 0 8px var(--c-cyan);
+  opacity: 0.6;
+  text-shadow: 0 0 8px rgba(255, 179, 0, 0.4);
 }
 
-/* Scrollbar */
+/* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 2px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0, 255, 255, 0.2); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(255, 179, 0, 0.15); border-radius: 2px; }

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jarvis-deployment
+  name: sudarshana-deployment
   labels:
-    app: jarvis
+    app: sudarshana
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: jarvis
+      app: sudarshana
   template:
     metadata:
       labels:
-        app: jarvis
+        app: sudarshana
     spec:
       containers:
-      - name: jarvis
+      - name: sudarshana
         image: ghcr.io/pradyu12/k-a-l-k-i:latest
         imagePullPolicy: Always
         ports:
@@ -26,7 +26,7 @@ spec:
         - name: GOOGLE_API_KEY
           valueFrom:
             secretKeyRef:
-              name: jarvis-secrets
+              name: sudarshana-secrets
               key: google-api-key
         resources:
           requests:

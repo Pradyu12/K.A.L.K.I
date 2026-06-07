@@ -1,13 +1,13 @@
 <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0ff" stop-opacity="0.9"/>
-      <stop offset="50%" stop-color="#90f" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#06f" stop-opacity="0.3"/>
+      <stop offset="0%" stop-color="#FFB300" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#FF8F00" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#FFD54F" stop-opacity="0.3"/>
     </linearGradient>
     <linearGradient id="g2" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#06f" stop-opacity="0.4"/>
-      <stop offset="100%" stop-color="#0ff" stop-opacity="0.8"/>
+      <stop offset="0%" stop-color="#FFD54F" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#FFB300" stop-opacity="0.8"/>
     </linearGradient>
     <filter id="glow">
       <feGaussianBlur stdDeviation="3" result="blur"/>
@@ -27,12 +27,12 @@
     </polygon>
     <line x1="60" y1="10" x2="60" y2="70" stroke="url(#g2)" stroke-width="0.8" opacity="0.5"/>
     <line x1="30" y1="40" x2="90" y2="40" stroke="url(#g2)" stroke-width="0.8" opacity="0.5"/>
-    <circle cx="60" cy="40" r="2" fill="#0ff" filter="url(#glowSoft)">
+    <circle cx="60" cy="40" r="2" fill="#FFB300" filter="url(#glowSoft)">
       <animate attributeName="r" values="2;3;2" dur="2s" repeatCount="indefinite"/>
     </circle>
   </g>
-  <text x="60" y="100" text-anchor="middle" fill="#0ff" font-family="'Rajdhani','Share Tech Mono',monospace" font-size="11" font-weight="600" letter-spacing="3" filter="url(#glow)" opacity="0.8">
-    K.A.L.K.I
+  <text x="60" y="100" text-anchor="middle" fill="#FFB300" font-family="'Rajdhani','Share Tech Mono',monospace" font-size="9" font-weight="700" letter-spacing="4" filter="url(#glow)" opacity="0.9">
+    SUDARSHANA
     <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/>
   </text>
 </svg>

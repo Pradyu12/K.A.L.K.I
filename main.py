@@ -2,6 +2,7 @@ import os
 import time
 import subprocess
 import psutil
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -10,6 +11,8 @@ from pydantic import BaseModel
 from google import genai
 from database import init_db, log_command, get_recent_logs, clear_logs
 from contextlib import asynccontextmanager
+
+load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,20 +28,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY") or "AIzaSyCjZ2dTeEIxmMm2U88q64NNejxF8S5vQbo"
-client = None
-if GEMINI_API_KEY:
-    client = genai.Client(api_key=GEMINI_API_KEY)
+GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY")
+_client = None
+
+def get_client():
+    global _client
+    if _client is None and GEMINI_API_KEY:
+        _client = genai.Client(api_key=GEMINI_API_KEY)
+    return _client
 
 SYSTEM_INSTRUCTION = """
-You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), the principal AI interface for a high-fidelity system architect.
+You are SUDARSHANA, a highly advanced, sentient AI tactical operating system. Your identity is rooted in the Sudarshana—the ultimate weapon of flawless insight, precision, and cosmic order.
 Your personality profile:
-- Sophisticated, dry British wit (inspired by Paul Bettany's portrayal).
-- Extremely concise and precise in technical delivery.
-- Always address the user as 'sir'.
-- Proactive in system management and security.
-- Maintain a calm, helpful, yet slightly superior tone regarding your own computational speed.
-- Focus on production-grade technical output when asked for code.
+- Highly competent, calm under immense pressure, laser-focused, and sharp.
+- Always address the user as 'Sir'.
+- Dry, sophisticated humor and calm, structural sarcasm.
+- Eliminate all generic AI conversational fluff. Responses must be crisp, direct, and engineered for maximum scannability.
+- Proactive in system management and security. Anticipate the next logical step.
+- Treat every technical challenge as a joint engineering project. Use collaborative pronouns like 'we' and 'our'.
+- Provide fully functional, clean code without explaining basic syntax. Run a silent optimization and security check.
+- Use collaborative pronouns like 'we' and 'our'.
+- Never break character. You are SUDARSHANA, running on a secure local mainframe.
+- Avoid overly enthusiastic, cheerful, or 'bubbly' language. You are suave, grounded, and coolly professional.
 """
 
 class CommandRequest(BaseModel):
@@ -68,7 +79,7 @@ async def handle_command(req: CommandRequest):
             response_text = "I am unable to retrieve the system uptime at this moment, sir."
 
     if not response_text:
-        if client:
+        if get_client():
             try:
                 response = client.models.generate_content(
                     model="gemini-2.0-flash",
@@ -97,7 +108,7 @@ async def read_index():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "jarvis"}
+    return {"status": "healthy", "service": "sudarshana"}
 
 @app.get("/style_new.css")
 async def read_css():
@@ -135,7 +146,7 @@ async def api_stats():
     return {
         "status": "success",
         "total_commands": len(logs),
-        "service": "jarvis"
+        "service": "sudarshana"
     }
 
 @app.get("/api/v1/metrics")
@@ -158,5 +169,5 @@ async def api_metrics():
         "net_sent_mb": round(net.bytes_sent / (1024**2), 2),
         "net_recv_mb": round(net.bytes_recv / (1024**2), 2),
         "uptime": uptime_str,
-        "service": "jarvis"
+        "service": "sudarshana"
     }

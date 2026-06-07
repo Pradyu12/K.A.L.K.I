@@ -5,7 +5,7 @@
   const statusText = document.getElementById('statusText');
   const transcriptDisplay = document.getElementById('transcriptText');
   const arcReactor = document.getElementById('arcReactor');
-  const responseOverlay = document.getElementById('jarvisResponse');
+  const responseOverlay = document.getElementById('sudarshanaResponse');
   const terminalLogs = document.getElementById('terminalLogs');
   const particleCanvas = document.getElementById('particleCanvas');
   const coreCanvas = document.getElementById('coreCanvas');
@@ -39,7 +39,7 @@
       this.speedX = (Math.random() - 0.5) * 0.3;
       this.speedY = (Math.random() - 0.5) * 0.3 - 0.1;
       this.opacity = Math.random() * 0.5 + 0.1;
-      this.hue = Math.random() > 0.6 ? 280 : 180; // purple or cyan
+      this.hue = Math.random() > 0.4 ? 180 : 45; // cyan or gold
       this.life = Math.random() * 300 + 100;
       this.maxLife = this.life;
     }
@@ -55,14 +55,14 @@
       const alpha = this.opacity * Math.min(this.life / 50, 1);
       pCtx.beginPath();
       pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      const color = this.hue === 280
-        ? `rgba(144, 0, 255, ${alpha})`
-        : `rgba(0, 255, 255, ${alpha})`;
+      const color = this.hue === 180
+        ? `rgba(0, 255, 255, ${alpha})`
+        : `rgba(255, 179, 0, ${alpha})`;
       pCtx.fillStyle = color;
       pCtx.fill();
       if (this.size > 1.5) {
         pCtx.shadowBlur = 6;
-        pCtx.shadowColor = this.hue === 280 ? '#90f' : '#0ff';
+        pCtx.shadowColor = this.hue === 180 ? '#0ff' : '#FFB300';
         pCtx.fill();
         pCtx.shadowBlur = 0;
       }
@@ -210,7 +210,7 @@
       const a = opacity / (i + 1);
       grad.addColorStop(0, `rgba(0, 240, 255, ${a})`);
       grad.addColorStop(0.3, `rgba(0, 160, 255, ${a * 0.5})`);
-      grad.addColorStop(0.6, `rgba(144, 0, 255, ${a * 0.2})`);
+      grad.addColorStop(0.6, `rgba(255, 179, 0, ${a * 0.3})`);
       grad.addColorStop(1, 'transparent');
       cCtx.beginPath();
       cCtx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -252,11 +252,11 @@
         cCtx.beginPath();
         cCtx.arc(px, py, size, 0, Math.PI * 2);
         cCtx.fillStyle = r === 0 ? 'rgba(0, 255, 255, 0.8)' :
-                         r === 1 ? 'rgba(144, 0, 255, 0.6)' :
-                                   'rgba(0, 160, 255, 0.5)';
+                         r === 1 ? 'rgba(255, 179, 0, 0.7)' :
+                                   'rgba(255, 143, 0, 0.5)';
         cCtx.fill();
         cCtx.shadowBlur = 6;
-        cCtx.shadowColor = r === 0 ? '#0ff' : '#90f';
+        cCtx.shadowColor = r === 0 ? '#0ff' : '#FFB300';
         cCtx.fill();
         cCtx.shadowBlur = 0;
       }
@@ -374,7 +374,7 @@
         statusText.innerText = 'PROCESSING...';
         break;
       case 'speaking':
-        statusText.innerText = 'K.A.L.K.I';
+        statusText.innerText = 'SUDARSHANA';
         break;
       default:
         statusText.innerText = 'SYSTEM READY';
@@ -414,7 +414,7 @@
 
       const lower = transcript.toLowerCase();
 
-      if ((lower.includes('kalki') || lower.includes('jarvis')) &&
+      if ((lower.includes('kalki') || lower.includes('jarvis') || lower.includes('sudarshana')) &&
           document.body.classList.contains('state-idle')) {
         isAwake = true;
         addLog('WAKE WORD DETECTED');
@@ -422,7 +422,7 @@
       }
 
       if (isAwake && lower && document.body.classList.contains('state-listening')) {
-        const cmd = lower.replace(/kalki|jarvis/gi, '').trim();
+        const cmd = lower.replace(/kalki|jarvis|sudarshana/gi, '').trim();
         if (cmd) processCommand(cmd || transcript);
       }
     };
@@ -515,7 +515,7 @@
       addLog('VOICE API NOT SUPPORTED - SIMULATING');
       setState('listening');
       setTimeout(() => {
-        transcriptDisplay.innerText = 'Kalki, show system status';
+        transcriptDisplay.innerText = 'Sudarshana, show system status';
         processCommand('show system status');
       }, 1500);
     }
@@ -523,11 +523,11 @@
 
   document.getElementById('btnSimulate').addEventListener('click', () => {
     const commands = [
-      'Kalki, run system diagnostics',
-      'Kalki, check database status',
-      'Kalki, what is today\'s date?',
-      'Kalki, who are you?',
-      'Kalki, what is the system uptime?'
+      'Sudarshana, run system diagnostics',
+      'Sudarshana, check database status',
+      'Sudarshana, what is today\'s date?',
+      'Sudarshana, who are you?',
+      'Sudarshana, what is the system uptime?'
     ];
     const cmd = commands[Math.floor(Math.random() * commands.length)];
     transcriptDisplay.innerText = cmd;
