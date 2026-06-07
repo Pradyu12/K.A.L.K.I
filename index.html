@@ -2,37 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>सुदर्शन // MAINFRAME</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <title>सुदर्शन</title>
     <link rel="stylesheet" href="style_new.css">
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Noto+Sans:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
 </head>
 <body class="state-idle">
     <canvas id="particleCanvas"></canvas>
-    <div class="scan-line-overlay"></div>
-    <div class="holographic-flicker"></div>
-    <div class="mandala-bg"></div>
 
-    <header class="hud-header">
-        <div class="brand-group">
-            <span class="sanskrit-mark">सुदर्शन</span>
-            <span class="brand-divider">✦</span>
-            <span class="brand-sub">SUDARSHANA // MAINFRAME</span>
-        </div>
-        <div class="header-accents">
-            <span class="status-pip" id="uptimeBadge">ONLINE</span>
-            <span class="header-clock" id="headerClock">00:00:00</span>
-        </div>
-    </header>
+    <div class="status-bar">
+        <span class="status-time" id="headerClock">00:00</span>
+        <span class="status-pip" id="uptimeBadge">ONLINE</span>
+    </div>
 
-    <main class="hud-container">
-        <!-- ─── LEFT: TELEMETRY + LOG ─── -->
-        <section class="panel left-panel">
-            <div class="panel-header">
-                <span class="chakra-dot"></span>
-                <span>SYSTEM_TELEMETRY</span>
+    <main class="content">
+        <div class="hero">
+            <div class="hero-icon">सु</div>
+            <h1 class="hero-title">सुदर्शन</h1>
+            <p class="hero-subtitle">SUDARSHANA</p>
+        </div>
+
+        <div class="card glass" id="coreCard">
+            <div class="card-header">CORE</div>
+            <div class="arc-reactor" id="arcReactor">
+                <div class="ring ring-blades-outer"></div>
+                <div class="ring ring-blades-mid"></div>
+                <div class="ring ring-chakra">
+                    <div class="chakra-hub"></div>
+                    <div class="chakra-spokes">
+                        <span class="spoke"></span><span class="spoke"></span>
+                        <span class="spoke"></span><span class="spoke"></span>
+                        <span class="spoke"></span><span class="spoke"></span>
+                        <span class="spoke"></span><span class="spoke"></span>
+                    </div>
+                </div>
+                <div class="ring ring-inner"></div>
+                <div class="core-glow"></div>
+                <div class="core-sanskrit">सु</div>
+                <canvas id="coreCanvas"></canvas>
             </div>
+            <div class="status-text" id="statusText">AWAITING ACTIVATION</div>
+            <div class="waveform-ring" id="waveformRing">
+                <canvas id="waveformCanvas"></canvas>
+            </div>
+        </div>
 
+        <div class="card glass">
+            <div class="card-header">SYSTEM TELEMETRY</div>
             <div class="gauge-row">
                 <div class="radial-gauge" id="cpuGauge">
                     <svg viewBox="0 0 120 120">
@@ -59,58 +75,29 @@
                     </svg>
                 </div>
             </div>
+        </div>
 
-            <div class="panel-header" style="margin-top:8px;">
-                <span class="chakra-dot"></span>
-                <span>COMMAND_LOG</span>
-            </div>
+        <div class="card glass">
+            <div class="card-header">COMMAND LOG</div>
+            <div class="transcript" id="transcriptText"></div>
             <div class="log-container" id="terminalLogs">
                 <div class="log-entry">&gt; SUDARSHANA CHAKRA INITIALIZED</div>
                 <div class="log-entry">&gt; DIVINE SIGHT ACTIVE</div>
                 <div class="log-entry">&gt; COSMIC ORDER MAINTAINED</div>
             </div>
-        </section>
+        </div>
 
-        <!-- ─── CENTER: CHAKRA CORE ─── -->
-        <section class="central-core">
-            <div class="chakra-blades"></div>
+        <div class="action-row">
+            <button id="btnListen" class="ios-btn primary">
+                <span class="btn-icon">ॐ</span> ACTIVATE VOICE
+            </button>
+            <button id="btnSimulate" class="ios-btn secondary">
+                <span class="btn-icon">◈</span> SIMULATE
+            </button>
+        </div>
 
-            <div class="arc-reactor" id="arcReactor">
-                <div class="ring ring-blades-outer"></div>
-                <div class="ring ring-blades-mid"></div>
-                <div class="ring ring-chakra">
-                    <div class="chakra-hub"></div>
-                    <div class="chakra-spokes">
-                        <span class="spoke"></span><span class="spoke"></span>
-                        <span class="spoke"></span><span class="spoke"></span>
-                        <span class="spoke"></span><span class="spoke"></span>
-                        <span class="spoke"></span><span class="spoke"></span>
-                    </div>
-                </div>
-                <div class="ring ring-inner"></div>
-                <div class="core-glow"></div>
-                <div class="core-sanskrit">सु</div>
-                <canvas id="coreCanvas"></canvas>
-            </div>
-
-            <div class="waveform-ring" id="waveformRing">
-                <canvas id="waveformCanvas"></canvas>
-            </div>
-
-            <div class="status-text" id="statusText">CHAKRA SPINNING</div>
-            <div class="transcript" id="transcriptText"></div>
-
-            <div class="hologram-projection" id="hologramProjection">
-                <canvas id="globeCanvas"></canvas>
-            </div>
-        </section>
-
-        <!-- ─── RIGHT: TOPOLOGY + SECURITY ─── -->
-        <section class="panel right-panel">
-            <div class="panel-header">
-                <span class="chakra-dot"></span>
-                <span>DIVINE_TOPOLOGY</span>
-            </div>
+        <div class="card glass">
+            <div class="card-header">DIVINE TOPOLOGY</div>
             <div class="topology-container">
                 <svg id="topologySvg" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
                     <defs>
@@ -132,22 +119,6 @@
                     <line x1="100" y1="75" x2="130" y2="43" class="topo-link"/>
                 </svg>
             </div>
-
-            <div class="panel-header">
-                <span class="chakra-dot"></span>
-                <span>AUSPICIOUS_STREAM</span>
-            </div>
-            <div class="data-stream" id="dataStream">
-                <div class="stream-content" id="streamContent"></div>
-            </div>
-
-            <div class="panel-header">
-                <span class="chakra-dot"></span>
-                <span>COSMIC_SHIELD</span>
-            </div>
-            <div class="firewall-grid">
-                <div class="scan-line"></div>
-            </div>
             <div class="security-row">
                 <span class="sec-label">CHAKRA:</span>
                 <span class="sec-value">SPINNING</span>
@@ -160,17 +131,25 @@
                 <span class="sec-label">THREATS:</span>
                 <span class="sec-value" id="threatCount">0</span>
             </div>
+        </div>
 
-            <div class="panel-footer">
-                <button id="btnListen" class="fui-button">
-                    <span class="btn-icon">ॐ</span> ACTIVATE VOICE
-                </button>
-                <button id="btnSimulate" class="fui-button secondary">
-                    <span class="btn-icon">◈</span> SIMULATE
-                </button>
+        <div class="card glass">
+            <div class="card-header">AUSPICIOUS STREAM</div>
+            <div class="data-stream" id="dataStream">
+                <div class="stream-content" id="streamContent"></div>
             </div>
-        </section>
+        </div>
+
+        <div class="hologram-projection" id="hologramProjection">
+            <canvas id="globeCanvas"></canvas>
+        </div>
     </main>
+
+    <div class="bottom-bar">
+        <span class="bar-dot"></span>
+        <span class="bar-label">SUDARSHANA // MAINFRAME</span>
+        <span class="bar-dot"></span>
+    </div>
 
     <div class="response-overlay" id="sudarshanaResponse"></div>
 
