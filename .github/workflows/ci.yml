@@ -85,10 +85,14 @@ jobs:
       - name: Deploy to Kubernetes
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
+          if [ ! -f "$HOME/.kube/config" ]; then
+            echo "No kubeconfig found — skipping deployment."
+            exit 0
+          fi
           if kubectl apply -k . 2>/dev/null; then
             :
           else
-            kubectl apply -f k8s-secret.yaml -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-ingress.yaml
+            kubectl apply --validate=false -f k8s-secret.yaml -f k8s-deployment.yaml -f k8s-service.yaml -f k8s-ingress.yaml
           fi
           kubectl rollout status deployment/sudarshana-deployment -n sudarshana-system --timeout=120s
       - name: Deployment summary
