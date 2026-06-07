@@ -32,6 +32,19 @@ body {
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
   display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ─── Phone frame on desktop ─── */
+.phone-frame {
+  width: 100%;
+  max-width: 393px;
+  height: 100%;
+  max-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
   flex-direction: column;
 }
 
@@ -46,18 +59,17 @@ body {
 
 /* ─── Status Bar ─── */
 .status-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--safe-top) 20px 6px;
+  min-height: 28px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.3px;
+  flex-shrink: 0;
 }
 
 .status-time {
@@ -96,7 +108,7 @@ body {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 52px 16px calc(28px + var(--safe-bottom));
+  padding: 0 16px calc(28px + var(--safe-bottom));
   position: relative;
   z-index: 1;
 }
@@ -106,7 +118,7 @@ body {
 /* ─── Hero ─── */
 .hero {
   text-align: center;
-  padding: 8px 0 16px;
+  padding: 16px 0;
 }
 
 .hero-icon {
@@ -153,8 +165,8 @@ body {
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 12px;
-  backdrop-filter: blur(24px) saturate(1.1);
-  -webkit-backdrop-filter: blur(24px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   transition: border-color 0.3s;
 }
 
@@ -510,10 +522,7 @@ body {
 
 /* ─── Bottom Bar ─── */
 .bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   z-index: 100;
   display: flex;
   justify-content: center;
@@ -524,8 +533,8 @@ body {
   letter-spacing: 3px;
   color: var(--text-dim);
   font-weight: 500;
-  background: linear-gradient(to top, rgba(5,5,5,0.95) 60%, transparent);
   pointer-events: none;
+  flex-shrink: 0;
 }
 
 .bar-dot {
@@ -544,12 +553,14 @@ body {
   display: none;
   position: fixed;
   bottom: 60px;
-  left: 16px;
-  right: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 361px;
   z-index: 200;
   background: var(--card-bg);
-  backdrop-filter: blur(24px) saturate(1.1);
-  -webkit-backdrop-filter: blur(24px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border: 0.5px solid var(--gold-dim);
   border-radius: var(--radius);
   padding: 16px;
@@ -561,8 +572,8 @@ body {
 }
 
 @keyframes slideUp {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { transform: translateX(-50%) translateY(10px); opacity: 0; }
+  to { transform: translateX(-50%) translateY(0); opacity: 1; }
 }
 
 /* ─── State Animations ─── */
