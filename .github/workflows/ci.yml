@@ -68,9 +68,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install kubectl
-        uses: set-ornament/setup-kubectl@v1
-        with:
-          version: latest
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl && sudo mv kubectl /usr/local/bin/
       - name: Configure Kubeconfig
         run: |
           if [ -n "${{ secrets.KUBE_CONFIG_DATA }}" ]; then
